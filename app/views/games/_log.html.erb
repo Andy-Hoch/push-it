@@ -1,0 +1,10 @@
+<details class="panel group" open>
+  <summary class="flex cursor-pointer items-center justify-between font-display text-xl">
+    <%= t("games.log") %><span class="text-cream/50 transition group-open:rotate-180">▾</span>
+  </summary>
+  <ol class="mt-3 max-h-80 space-y-1.5 overflow-y-auto pr-1 text-sm text-cream/80">
+    <% table.log.reverse_each do |entry| %>
+      <li class="<%= "font-extrabold text-gold" if entry["key"].in?(%w[ flip_seven won round_started tie_break ]) %><%= " text-ember" if entry["key"] == "busted" %>"><%= log_line entry %></li>
+    <% end %>
+  </ol>
+</details>

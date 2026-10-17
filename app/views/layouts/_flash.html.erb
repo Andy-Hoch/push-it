@@ -1,0 +1,9 @@
+<div id="flash" class="pointer-events-none fixed inset-x-0 top-3 z-50 flex flex-col items-center gap-2 px-4">
+  <% flash.each do |type, message| %>
+    <div class="toast <%= type == "alert" ? "bg-ember text-white" : "bg-cream text-ink" %>"
+         role="<%= type == "alert" ? "alert" : "status" %>"
+         data-controller="dismiss" data-dismiss-after-value="4500" data-action="click->dismiss#remove">
+      <%= message %>
+    </div>
+  <% end %>
+</div>

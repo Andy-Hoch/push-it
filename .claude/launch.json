@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "flip7",
+      "runtimeExecutable": "bin/dev",
+      "runtimeArgs": [],
+      "port": 3000
+    }
+  ]
+}

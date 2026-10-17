@@ -1,0 +1,30 @@
+<div class="flex flex-1 flex-col items-center justify-center gap-4 py-2 sm:flex-row sm:gap-8">
+  <div class="flex items-end gap-4">
+    <div class="relative" title="<%= t("games.deck") %>">
+      <% if table.deck_size.positive? %>
+        <div class="card card-back card-md absolute top-1 left-1 opacity-60"></div>
+        <div class="card card-back card-md relative"></div>
+      <% else %>
+        <div class="card card-slot card-md"></div>
+      <% end %>
+      <span class="chip absolute -right-3 -bottom-3 !bg-ink !px-2 font-display"><%= table.deck_size %></span>
+    </div>
+    <div title="<%= t("games.discard") %>">
+      <% if (code = table.top_discard) %>
+        <%= card_tag code, size: :md, style: "rotate: -4deg; animation: none; opacity: .85" %>
+      <% else %>
+        <div class="card card-slot card-md"></div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="text-center sm:text-left" aria-live="polite">
+    <p class="font-display text-2xl sm:text-3xl"><%= render "games/status_line", table: table %></p>
+    <% if table.deadline && table.pending&.dig("type") != "next_round" %>
+      <div class="mt-2"><%= countdown_tag table.deadline %></div>
+    <% end %>
+    <% if (last = table.log.last) %>
+      <p class="mt-1 text-sm text-cream/75"><%= log_line last %></p>
+    <% end %>
+  </div>
+</div>

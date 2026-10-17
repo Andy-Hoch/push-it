@@ -1,0 +1,16 @@
+<div class="panel">
+  <h2 class="mb-3 text-xl"><%= t("games.scoreboard") %></h2>
+  <ol class="space-y-2">
+    <% table.standings.each_with_index do |player, index| %>
+      <li class="flex items-center gap-3">
+        <span class="w-5 text-right font-display text-cream/50"><%= index + 1 %></span>
+        <%= avatar_tag table.name_for(player), classes: "!size-7 !text-sm" %>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-extrabold <%= "text-gold" if table.me?(player) %>"><%= table.name_for(player) %></p>
+          <div class="progress !h-1.5"><span style="width: <%= table.progress(player) %>%"></span></div>
+        </div>
+        <span class="font-display text-lg tabular-nums"><%= player["total"] %></span>
+      </li>
+    <% end %>
+  </ol>
+</div>

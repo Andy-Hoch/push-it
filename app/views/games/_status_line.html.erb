@@ -1,0 +1,14 @@
+<% pending = table.pending %>
+<% if table.phase == "game_over" %>
+  <%= t("games.status_line.game_over", player: table.winner ? table.name_for(table.winner) : "–") %>
+<% elsif pending.nil? || pending["type"] == "next_round" %>
+  <%= t("games.status_line.round_over") %>
+<% elsif table.my_turn? %>
+  <span class="text-gold"><%= t("games.status_line.your_turn") %></span>
+<% elsif table.my_choice? %>
+  <span class="text-gold"><%= t("games.status_line.your_choice", card: table.pending_card.label) %></span>
+<% elsif pending["type"] == "turn" %>
+  <%= t("games.status_line.turn", player: table.name_for(table.pending_player)) %>
+<% else %>
+  <%= t("games.status_line.choice", player: table.name_for(table.pending_player), card: table.pending_card.label) %>
+<% end %>

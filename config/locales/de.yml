@@ -1,0 +1,260 @@
+de:
+  activerecord:
+    models:
+      user: Account
+    attributes:
+      user:
+        email_address: E-Mail-Adresse
+        password: Passwort
+        password_confirmation: Passwort-Bestätigung
+      profile:
+        name: Name
+
+  gameplay:
+    cards:
+      freeze: Freeze
+      flip3: Flip Three
+      chance: Second Chance
+    errors:
+      not_seated: Du sitzt nicht an diesem Tisch.
+      round_in_progress: Die Runde läuft noch.
+      not_your_turn: Du bist gerade nicht am Zug.
+      must_hit: Ohne Karte vor dir kannst du nicht stehen bleiben – zieh eine Karte.
+      not_your_choice: Du musst gerade kein Ziel wählen.
+      invalid_target: Dieser Spieler kann die Karte nicht bekommen.
+      already_started: Das Spiel hat schon begonnen.
+      game_full: Der Tisch ist voll.
+      not_host: Nur der Gastgeber kann das tun.
+      not_enough_players: Es braucht mindestens zwei Spieler.
+      game_not_running: Das Spiel läuft gerade nicht.
+      game_not_finished: Das Spiel ist noch nicht vorbei.
+
+  log:
+    round_started: "Runde %{round} – %{dealer} teilt aus."
+    hit: "%{player} zieht eine Karte."
+    stayed: "%{player} bleibt stehen und sichert %{points} Punkte."
+    drew: "%{player} deckt %{card} auf."
+    drew_action: "%{player} deckt %{card} auf!"
+    held: "%{player} legt %{card} beiseite – sie wird nach Flip Three gespielt."
+    saved: "%{player} rettet sich mit Second Chance vor der doppelten %{card}!"
+    busted: "%{player} hat die %{card} doppelt – Bust!"
+    extra_chance: "%{player} hat schon eine Second Chance und muss die neue weitergeben."
+    chance_discarded: "Niemand kann die Second Chance von %{player} annehmen – sie wird abgeworfen."
+    forced: "%{card} von %{player} hat nur ein mögliches Ziel."
+    froze: "%{player} friert %{target} ein – %{points} Punkte gesichert."
+    flip_three: "%{player} spielt Flip Three auf %{target}."
+    gave_chance: "%{player} gibt %{target} eine Second Chance."
+    reshuffled: "Der Nachziehstapel ist leer – der Ablagestapel wird neu gemischt."
+    flip_seven: "FLIP 7! %{player} hat sieben verschiedene Zahlen!"
+    deck_exhausted: "Keine Karten mehr – die Runde endet."
+    round_scored: "Runde %{round} ist gewertet."
+    tie_break: "Gleichstand an der Spitze – es wird weitergespielt, bis einer allein vorne liegt!"
+    won: "%{player} gewinnt mit %{points} Punkten!"
+    left: "%{player} hat den Tisch verlassen."
+
+  layouts:
+    nav:
+      home: Zur Startseite
+      guest: Gast
+      sign_in: Anmelden
+      sign_up: Account erstellen
+      sign_out: Abmelden
+
+  home:
+    show:
+      tagline: Das Kartenspiel, bei dem du dein Glück herausforderst. Zieh Karte um Karte – aber eine doppelte Zahl und alles ist weg. Spiel mit Freunden in Echtzeit, ganz ohne Anmeldung.
+      rules_link: Regeln ansehen ↓
+      name: Dein Name
+      name_placeholder: z. B. Kim
+      new_game: Neues Spiel starten
+      or_join: oder mit Code beitreten
+      code: Einladungscode
+      join: Beitreten
+      sign_up: Account erstellen
+      guest_hint_html: Du spielst als Gast – dein Profil wird in diesem Browser gespeichert. %{sign_up}, um deinen Spielstand dauerhaft zu sichern.
+      open_games: Deine offenen Partien
+
+  rules:
+    title: So wird Flip 7 gespielt
+    goal: Wer am Ende einer Runde als Erster mindestens 200 Punkte hat, gewinnt – bei Gleichstand an der Spitze geht es weiter. Jede Runde teilt der Dealer jedem eine offene Karte aus, dann entscheidet reihum jeder, ob er noch eine Karte zieht oder stehen bleibt.
+    turn_title: Ziehen oder stehen bleiben
+    turn: Zieh so viele Karten wie du willst. Bleibst du stehen, sicherst du deine Punkte für diese Runde. Ohne Karte vor dir musst du ziehen.
+    bust_title: Bust!
+    bust: Ziehst du eine Zahl, die du schon hast, bist du raus und bekommst in dieser Runde 0 Punkte – auch Bonuskarten helfen dann nicht.
+    flip7_title: Flip 7
+    flip7: Sieben verschiedene Zahlen (die 0 zählt mit) beenden die Runde sofort und bringen 15 Bonuspunkte. Alle anderen werten ihre Karten.
+    scoring_title: Wertung
+    scoring: Zahlen addieren, mit ×2 verdoppeln (nur die Zahlen), dann +2 bis +10 dazu, dann +15 für Flip 7.
+    deck_title: Das Deck
+    deck: "94 Karten: einmal die 0 und die 1, zweimal die 2 … zwölfmal die 12, dazu +2, +4, +6, +8, +10, ×2 und je drei Freeze, Flip Three und Second Chance. Zwischen den Runden wird nicht gemischt."
+    cards:
+      freeze: Gib sie einem aktiven Spieler (auch dir selbst) – er sichert sofort seine Punkte und ist für die Runde raus.
+      flip3: Der gewählte Spieler muss drei Karten nacheinander aufdecken. Dabei gezogene Freeze- und Flip-Three-Karten werden erst danach gespielt.
+      chance: Schützt einmal vor einer doppelten Zahl – beide Karten werden abgeworfen. Du darfst nur eine haben, eine zweite musst du weitergeben.
+      mx2: Verdoppelt die Summe deiner Zahlenkarten. Die anderen Bonuskarten werden danach addiert.
+
+  profiles:
+    guest: Gast
+    updated: Name gespeichert.
+    show:
+      empty_title: Noch kein Profil
+      empty: Starte oder betritt ein Spiel – dein Gastprofil entsteht dabei automatisch.
+      play: Jetzt spielen
+      guest: Gastprofil – gespeichert in diesem Browser
+      account: "Account: %{email}"
+      stats:
+        games_played: Spiele
+        games_won: Siege
+        win_rate: Siegquote
+        flip7_count: Flip 7s
+        best_round: Beste Runde
+        total_points: Punkte gesamt
+      name_title: Dein Name
+      save: Speichern
+      save_title: Spielstand sichern
+      save_hint: Dein Gastprofil lebt im Local Storage dieses Browsers. Mit einem Account werden Statistik und laufende Partien übernommen und sind überall verfügbar – auch mitten im Spiel.
+      account_title: Account
+      account_hint: Dein Spielstand ist in deinem Account gespeichert.
+      history: Letzte Partien
+      no_history: Noch keine beendeten Partien.
+      won: Sieg
+      place: "Platz %{place}"
+
+  sessions:
+    signed_in: Willkommen zurück!
+    signed_out: Du bist abgemeldet.
+    invalid: E-Mail-Adresse oder Passwort stimmen nicht.
+    rate_limited: Zu viele Versuche – bitte warte kurz.
+    new:
+      title: Anmelden
+      guest_hint: Dein aktuelles Gastprofil wird dabei in deinen Account übernommen.
+      email: E-Mail-Adresse
+      password: Passwort
+      submit: Anmelden
+      forgot: Passwort vergessen?
+      sign_up: Account erstellen
+
+  registrations:
+    created: Account erstellt – dein Spielstand ist jetzt gesichert.
+    new:
+      title: Account erstellen
+      hint: Speichere deinen Spielstand dauerhaft.
+      guest_hint: "Dein Gastprofil „%{name}“ mit Statistik und laufenden Partien wird übernommen."
+      password_confirmation: Passwort wiederholen
+      submit: Account erstellen
+      have_account: Schon einen Account? Anmelden
+
+  passwords:
+    sent: Falls ein Account mit dieser Adresse existiert, haben wir dir eine E-Mail geschickt.
+    reset: Dein Passwort wurde geändert.
+    mismatch: Die Passwörter stimmen nicht überein.
+    invalid: Der Link ist ungültig oder abgelaufen.
+    new:
+      title: Passwort vergessen?
+      submit: Link zum Zurücksetzen senden
+    edit:
+      title: Neues Passwort
+      password: Neues Passwort
+      submit: Speichern
+
+  passwords_mailer:
+    reset:
+      subject: Passwort für Flip 7 zurücksetzen
+      link: diese Seite
+      body_html: Du kannst dein Passwort über %{link} zurücksetzen. Der Link ist %{expires} gültig.
+      body_text: "Du kannst dein Passwort hier zurücksetzen: %{url} – der Link ist %{expires} gültig."
+
+  games:
+    not_found: Kein Spiel mit diesem Code gefunden.
+    not_seated: Du sitzt nicht an diesem Tisch.
+    host_only: Nur der Gastgeber kann das tun.
+    statuses:
+      lobby: Lobby
+      playing: Läuft
+      finished: Beendet
+    status:
+      active: Im Spiel
+      stayed: Steht
+      frozen: Eingefroren
+      busted: Bust
+      out: Ausgesetzt
+      waiting: Wartet
+      flip7: Flip 7!
+      left: Gegangen
+    status_line:
+      your_turn: Du bist dran!
+      your_choice: "Wähle ein Ziel für %{card}"
+      turn: "%{player} ist am Zug"
+      choice: "%{player} wählt ein Ziel für %{card}"
+      round_over: Die Runde ist vorbei
+      game_over: "%{player} hat gewonnen!"
+    dealer: Dealer
+    deck: Nachziehstapel
+    discard: Ablagestapel
+    you: du
+    this_round: Runde
+    total: Gesamt
+    scoreboard: Punktestand
+    log: Spielverlauf
+    choose_target: "%{card} geben"
+    actions:
+      hit: Karte ziehen
+      stay: "Stay · %{points}"
+      must_hit: Du hast noch keine Karte – du musst ziehen.
+      choose: "Wer bekommt %{card}?"
+      myself: Ich selbst
+      busted: Bust! Diese Runde gibt es 0 Punkte.
+      banked: "%{points} Punkte gesichert – warte auf die anderen."
+      wait: Warte, bis du dran bist …
+      choose_hint:
+        freeze: Der Spieler sichert sofort seine Punkte und ist für die Runde raus.
+        flip3: Der Spieler muss drei Karten nacheinander aufdecken.
+        chance: Du hast schon eine – gib sie einem Spieler ohne Second Chance.
+    lobby:
+      invite_code: Einladungscode
+      copy_link: Link kopieren
+      share: Teilen
+      invite_hint: Freunde geben den Code auf der Startseite ein oder öffnen einfach den Link.
+      players: Am Tisch
+      you: du
+      host: Gastgeber
+      remove: "%{name} entfernen"
+      remove_confirm: "%{name} wirklich vom Tisch entfernen?"
+      join: Mitspielen
+      turn_seconds: Zeit pro Zug
+      no_timer: ohne Zeitlimit
+      seconds:
+        one: "%{count} Sekunde"
+        other: "%{count} Sekunden"
+      target_score: Ziel
+      points:
+        one: "%{count} Punkt"
+        other: "%{count} Punkte"
+      start: Spiel starten
+      need_players: Warte auf mindestens einen weiteren Spieler.
+      waiting_for_host: "Warte, bis %{host} das Spiel startet … (%{timer} pro Zug, Ziel: %{target} Punkte)"
+      leave: Tisch verlassen
+    table:
+      round: "Runde %{round}"
+      target: "Ziel: %{target}"
+      leave: Tisch verlassen
+      leave_confirm: Willst du das Spiel wirklich verlassen? Du wirst ab sofort übersprungen.
+    round_summary:
+      kicker: Wertung
+      title: "Runde %{round}"
+      peek: Tisch ansehen
+      player: Spieler
+      numbers: Zahlen
+      modifiers: Bonus
+      round_points: Runde
+      total: Gesamt
+      next_round: Nächste Runde
+      auto_start: Startet automatisch in
+    game_over:
+      kicker: Spiel vorbei
+      winner: "%{player} gewinnt!"
+      no_winner: Spiel beendet
+      points: "%{points} Punkte nach %{rounds} Runden"
+      rematch: Revanche!
+      to_rematch: Zur Revanche
+      home: Zur Startseite

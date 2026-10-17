@@ -1,0 +1,32 @@
+<article id="seat-<%= player["id"] %>" class="<%= class_names(seat_classes(table, player)) %>">
+  <header class="flex items-center gap-2">
+    <%= avatar_tag table.name_for(player) %>
+    <div class="min-w-0 flex-1">
+      <p class="flex items-center gap-1.5 truncate font-extrabold">
+        <span class="truncate"><%= table.name_for(player) %></span>
+        <% if table.dealer_id == player["id"] %><span class="dealer-chip" title="<%= t("games.dealer") %>">D</span><% end %>
+      </p>
+      <div class="flex items-center gap-1.5"><%= status_badge player %><% if player["left"] %><span class="badge badge-out"><%= t("games.status.left") %></span><% end %></div>
+    </div>
+    <div class="text-right leading-tight">
+      <p class="font-display text-2xl"><%= player["total"] %></p>
+      <p class="text-xs font-bold text-cream/70">+<%= table.score(player)["total"] %></p>
+    </div>
+  </header>
+
+  <div class="hand justify-start">
+    <% if player["cards"].empty? %>
+      <div class="card card-slot card-sm"></div>
+    <% end %>
+    <% player["cards"].each do |entry| %>
+      <%= hand_entry_tag entry, size: :sm %>
+    <% end %>
+  </div>
+
+  <div class="progress"><span style="width: <%= table.progress(player) %>%"></span></div>
+
+  <% if table.choosable?(player) %>
+    <%= button_to t("games.choose_target", card: table.pending_card.label), game_choice_path(table.game), params: { target_id: player["id"] },
+          class: "btn btn-gold w-full !py-2 text-base" %>
+  <% end %>
+</article>

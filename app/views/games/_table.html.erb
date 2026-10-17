@@ -1,0 +1,39 @@
+<% me = table.me %>
+<main class="mx-auto grid max-w-7xl gap-6 px-3 pb-24 sm:px-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
+  <section class="felt flex min-h-[72vh] flex-col gap-4 sm:gap-6">
+    <header class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="chip"><%= t(".round", round: table.round) %></span>
+        <span class="chip"><%= t(".target", target: table.target) %></span>
+      </div>
+      <span class="chip font-display tracking-[0.25em]">#<%= table.game.code %></span>
+    </header>
+
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <% table.others.each do |player| %>
+        <%= render "games/seat", table: table, player: player %>
+      <% end %>
+    </div>
+
+    <%= render "games/center", table: table %>
+
+    <% if me %>
+      <%= render "games/my_seat", table: table, player: me %>
+    <% end %>
+  </section>
+
+  <aside class="space-y-5">
+    <%= render "games/scoreboard", table: table %>
+    <%= render "games/log", table: table %>
+    <% if table.seat && !table.game.finished? %>
+      <%= button_to t(".leave"), game_seat_path(table.game), method: :delete, class: "btn-ghost w-full text-sm",
+            form: { data: { turbo_confirm: t(".leave_confirm") } } %>
+    <% end %>
+  </aside>
+</main>
+
+<% if table.phase == "round_over" %>
+  <%= render "games/round_summary", table: table %>
+<% elsif table.phase == "game_over" %>
+  <%= render "games/game_over", table: table %>
+<% end %>

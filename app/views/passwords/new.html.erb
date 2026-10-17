@@ -1,0 +1,9 @@
+<%= render layout: "layouts/auth_card", locals: { title: t("passwords.new.title") } do %>
+  <%= form_with url: passwords_path, class: "space-y-4" do |form| %>
+    <div>
+      <%= form.label :email_address, t("sessions.new.email"), class: "label" %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: "field" %>
+    </div>
+    <%= form.button t("passwords.new.submit"), class: "btn btn-gold w-full" %>
+  <% end %>
+<% end %>

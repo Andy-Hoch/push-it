@@ -1,0 +1,60 @@
+<main class="mx-auto max-w-6xl px-4 pb-20">
+  <section class="grid items-center gap-10 pt-4 lg:grid-cols-[1.15fr_1fr] lg:pt-10">
+    <div class="text-center lg:text-left">
+      <div class="hand mb-8 justify-center lg:justify-start" aria-hidden="true">
+        <% [ [ "n7", -18 ], [ "n3", -11 ], [ "mx2", -5 ], [ "n12", 0 ], [ "freeze", 6 ], [ "n9", 12 ], [ "flip3", 18 ] ].each_with_index do |(code, tilt), index| %>
+          <%= card_tag code, size: :md, style: "rotate: #{tilt}deg; translate: 0 #{(tilt.abs * 0.6).round}px; animation-delay: #{index * 90}ms" %>
+        <% end %>
+      </div>
+      <h1 class="logo text-7xl sm:text-8xl">FLIP 7</h1>
+      <p class="mx-auto mt-5 max-w-lg text-lg text-cream/85 lg:mx-0"><%= t(".tagline") %></p>
+      <%= link_to t(".rules_link"), "#regeln", class: "btn-ghost mt-3" %>
+    </div>
+
+    <%= form_with url: games_path, class: "paper space-y-5" do |form| %>
+      <div>
+        <%= form.label :name, t(".name"), class: "label" %>
+        <%= form.text_field :name, value: current_profile&.name, maxlength: 24, placeholder: t(".name_placeholder"), autocomplete: "nickname", class: "field" %>
+      </div>
+
+      <%= form.button t(".new_game"), class: "btn btn-gold w-full text-xl", formnovalidate: true %>
+
+      <div class="flex items-center gap-3 text-sm font-extrabold tracking-wider text-ink/40 uppercase">
+        <span class="h-px flex-1 bg-ink/15"></span><%= t(".or_join") %><span class="h-px flex-1 bg-ink/15"></span>
+      </div>
+
+      <div class="flex gap-2">
+        <%= form.text_field :code, maxlength: 6, required: true, placeholder: "ABC123", autocomplete: "off", autocapitalize: "characters",
+              aria: { label: t(".code") }, pattern: "[A-Za-z0-9]{6}", class: "field code-input min-w-0 flex-1" %>
+        <%= form.button t(".join"), formaction: join_path, class: "btn btn-ember shrink-0" %>
+      </div>
+
+      <% if current_profile.nil? || current_profile.guest? %>
+        <p class="text-sm text-ink/60"><%= t(".guest_hint_html", sign_up: link_to(t(".sign_up"), new_registration_path, class: "font-extrabold underline")) %></p>
+      <% end %>
+    <% end %>
+  </section>
+
+  <% if @open_games.any? %>
+    <section class="panel mt-12">
+      <h2 class="text-2xl"><%= t(".open_games") %></h2>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+        <% @open_games.each do |game| %>
+          <li>
+            <%= link_to game_path(game), class: "seat flex-row items-center justify-between hover:bg-white/10" do %>
+              <div class="min-w-0">
+                <p class="font-display text-xl tracking-[0.2em]"><%= game.code %></p>
+                <p class="truncate text-sm text-cream/70"><%= game.seats.map(&:name).to_sentence %></p>
+              </div>
+              <span class="badge <%= game.playing? ? "badge-stayed" : "badge-active" %>"><%= t("games.statuses.#{game.status}") %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <section id="regeln" class="mt-12 scroll-mt-6">
+    <%= render "home/rules" %>
+  </section>
+</main>

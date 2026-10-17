@@ -1,0 +1,17 @@
+<%= render layout: "layouts/auth_card", locals: { title: t("sessions.new.title"), subtitle: (t("sessions.new.guest_hint") if current_profile&.guest?) } do %>
+  <%= form_with url: session_path, class: "space-y-4" do |form| %>
+    <div>
+      <%= form.label :email_address, t("sessions.new.email"), class: "label" %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: "field" %>
+    </div>
+    <div>
+      <%= form.label :password, t("sessions.new.password"), class: "label" %>
+      <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72, class: "field" %>
+    </div>
+    <%= form.button t("sessions.new.submit"), class: "btn btn-gold w-full" %>
+  <% end %>
+  <div class="mt-5 flex justify-between text-sm font-bold text-ink/70">
+    <%= link_to t("sessions.new.forgot"), new_password_path, class: "underline" %>
+    <%= link_to t("sessions.new.sign_up"), new_registration_path, class: "underline" %>
+  </div>
+<% end %>
