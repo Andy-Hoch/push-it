@@ -1,4 +1,4 @@
-<div class="flex flex-col items-center gap-3 pt-1">
+<div class="flex flex-col items-center gap-3 pt-1" data-deal-target="controls">
   <% if table.my_turn? %>
     <div class="grid w-full max-w-xl grid-cols-2 gap-3">
       <%= button_to game_hit_path(table.game), class: "btn btn-gold w-full text-xl sm:text-2xl", form: { class: "contents" } do %>

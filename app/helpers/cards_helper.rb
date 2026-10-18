@@ -1,13 +1,13 @@
 module CardsHelper
   ACTION_ICONS = { "freeze" => "❄", "flip3" => "3", "chance" => "♥" }.freeze
 
-  def card_tag(code, size: :md, flag: nil, uid: nil, style: nil)
+  def card_tag(code, size: :md, flag: nil, uid: nil, style: nil, data: nil, classes: nil)
     card = code.is_a?(Gameplay::Card) ? code : Gameplay::Card.new(code)
     classes = [ "card", "card-#{size}", ("card-modifier" if card.modifier?), ("card-action card-#{card.code}" if card.action?),
-                ("is-bust" if flag == "bust"), ("is-held" if flag == "held") ]
+                ("is-bust" if flag == "bust"), ("is-held" if flag == "held"), classes ]
     ink = card.number? ? "--ink: var(--color-n#{card.value});" : ""
 
-    tag.div(id: uid && "card-#{uid}", class: classes, style: "#{ink}#{style}", title: card.label, aria: { label: card.label }) do
+    tag.div(id: uid && "card-#{uid}", class: classes, style: "#{ink}#{style}", title: card.label, aria: { label: card.label }, data: data) do
       if card.action?
         safe_join([ tag.span(ACTION_ICONS[card.code], class: "card__value"), tag.span(card.label, class: "card__title") ])
       else
@@ -17,7 +17,9 @@ module CardsHelper
     end
   end
 
+  # A card lying on the table; the deal controller animates it from the deck.
   def hand_entry_tag(entry, size: :md)
-    card_tag(entry["code"], size: size, flag: entry["flag"], uid: entry["uid"])
+    card_tag(entry["code"], size: size, flag: entry["flag"], uid: entry["uid"], classes: "card-dealable",
+             data: { deal_target: "card", uid: entry["uid"] })
   end
 end

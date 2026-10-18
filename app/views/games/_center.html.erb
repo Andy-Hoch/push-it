@@ -3,7 +3,7 @@
     <div class="relative" title="<%= t("games.deck") %>">
       <% if table.deck_size.positive? %>
         <div class="card card-back card-md absolute top-1 left-1 opacity-60"></div>
-        <div class="card card-back card-md relative"></div>
+        <div class="card card-back card-md relative" data-deal-target="deck"></div>
       <% else %>
         <div class="card card-slot card-md"></div>
       <% end %>
@@ -24,7 +24,7 @@
       <div class="mt-2"><%= countdown_tag table.deadline %></div>
     <% end %>
     <% if (last = table.log.last) %>
-      <p class="mt-1 text-sm text-cream/75"><%= log_line last %></p>
+      <p class="mt-1 text-sm text-cream/75" data-deal-target="spoiler"><%= log_line last %></p>
     <% end %>
   </div>
 </div>

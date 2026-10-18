@@ -285,6 +285,9 @@
     color: rgb(229 72 47 / 0.75);
   }
 
+  /* Table cards are animated by the deal controller instead (see deal_controller.js). */
+  .card.card-dealable { animation: none; }
+
   .card.is-held { transform: rotate(8deg) translateY(-6%); filter: saturate(0.6) brightness(0.9); }
 
   .card-back {
