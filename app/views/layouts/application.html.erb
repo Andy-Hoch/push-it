@@ -24,7 +24,8 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body data-controller="identity"
+  <body data-controller="identity anchor"
+        data-action="click->anchor#scroll"
         data-identity-snapshot-value="<%= (current_profile&.snapshot || {}).to_json %>"
         data-identity-restore-url-value="<%= profile_restoration_path %>"
         data-identity-signed-in-value="<%= authenticated?.present? %>">

@@ -8,7 +8,7 @@
       </div>
       <h1 class="logo text-7xl sm:text-8xl">PUSH IT</h1>
       <p class="mx-auto mt-5 max-w-lg text-lg text-cream/85 lg:mx-0"><%= t(".tagline") %></p>
-      <%= link_to t(".rules_link"), "#regeln", class: "btn-ghost mt-3" %>
+      <p class="mt-8"><%= link_to t(".rules_link"), "#regeln", class: "link-anchor" %></p>
     </div>
 
     <%= form_with url: games_path, class: "paper space-y-5" do |form| %>
