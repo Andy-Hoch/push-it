@@ -36,3 +36,11 @@ bin/rubocop && bin/brakeman
 ```
 
 Zum lokalen Testen mit zwei Spielern: Ein Tab öffnet `http://localhost:3000`, der andere `http://127.0.0.1:3000`. Beide haben getrennte Cookies.
+
+## Releases
+
+Jeder Merge in `main` startet nach grüner CI den Workflow `Release` (`.github/workflows/release.yml`):
+
+1. Das Docker-Image wird gebaut und als `ghcr.io/andy-hoch/push-it:<version>` in der GitHub Container Registry abgelegt. Die Version hat die Form `vJJJJ.MM.TT.<Laufnummer>`.
+2. Unter *Releases* entsteht ein Entwurf mit automatisch erzeugten Release-Notes.
+3. Wenn du den Entwurf veröffentlichst, bekommt das Image zusätzlich den Tag `latest`.
