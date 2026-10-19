@@ -1,0 +1,73 @@
+<main class="mx-auto max-w-4xl space-y-8 px-4 pb-20">
+  <section class="felt px-4 py-10 text-center sm:py-12">
+    <p class="chip"><%= t(".invite_code") %></p>
+    <div class="hand hand-spread mt-5" aria-label="<%= game.code %>">
+      <% game.code.chars.each_with_index do |char, index| %>
+        <div class="card card-md" style="--ink: var(--color-n<%= [ 3, 4, 7, 10, 11, 6 ][index] %>); animation-delay: <%= index * 80 %>ms">
+          <span class="card__value"><%= char %></span>
+        </div>
+      <% end %>
+    </div>
+    <div class="mt-7 flex flex-wrap justify-center gap-3" data-controller="clipboard" data-clipboard-text-value="<%= game_url(game) %>" data-clipboard-title-value="Push It">
+      <button type="button" class="btn btn-cream" data-action="clipboard#copy">
+        <span data-clipboard-target="label"><%= t(".copy_link") %></span>
+      </button>
+      <button type="button" class="btn btn-cream hidden" data-clipboard-target="share" data-action="clipboard#share"><%= t(".share") %></button>
+    </div>
+    <p class="mt-4 text-sm text-cream/70"><%= t(".invite_hint") %></p>
+  </section>
+
+  <section class="panel space-y-6">
+    <div class="flex items-baseline justify-between gap-4">
+      <h2 class="text-2xl"><%= t(".players") %></h2>
+      <span class="chip"><%= game.present_seats.size %> / <%= Game::Seating::MAX_PLAYERS %></span>
+    </div>
+
+    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <% game.seats.each do |player_seat| %>
+        <li class="seat flex-row items-center gap-3" id="<%= dom_id player_seat %>">
+          <%= avatar_tag player_seat.name %>
+          <div class="min-w-0 flex-1">
+            <p class="truncate font-extrabold"><%= player_seat.name %><%= " (#{t(".you")})" if player_seat == seat %></p>
+            <% if game.host_id == player_seat.profile_id %><p class="text-xs font-extrabold text-gold uppercase">♛ <%= t(".host") %></p><% end %>
+          </div>
+          <% if game.host?(current_profile) && player_seat != seat %>
+            <%= button_to "✕", game_seat_path(game), method: :delete, params: { seat_id: player_seat.id }, class: "btn-ghost !px-2 !py-1",
+                  aria: { label: t(".remove", name: player_seat.name) }, form: { data: { turbo_confirm: t(".remove_confirm", name: player_seat.name) } } %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+    <% if seat.nil? %>
+      <%= form_with url: game_seat_path(game), class: "paper flex flex-col gap-3 sm:flex-row sm:items-end" do |form| %>
+        <div class="flex-1">
+          <%= form.label :name, t("home.show.name"), class: "label" %>
+          <%= form.text_field :name, value: current_profile&.name, maxlength: 24, placeholder: t("home.show.name_placeholder"), class: "field" %>
+        </div>
+        <%= form.button t(".join"), class: "btn btn-gold" %>
+      <% end %>
+    <% elsif game.host?(current_profile) %>
+      <%= form_with model: game, class: "grid gap-4 sm:grid-cols-2", data: { controller: "autosubmit" } do |form| %>
+        <div>
+          <%= form.label :turn_seconds, t(".turn_seconds"), class: "label !text-cream/60" %>
+          <%= form.select :turn_seconds, Game::TURN_SECONDS.map { |seconds| [ seconds.zero? ? t(".no_timer") : t(".seconds", count: seconds), seconds ] }, {}, class: "field", data: { action: "autosubmit#submit" } %>
+        </div>
+        <div>
+          <%= form.label :target_score, t(".target_score"), class: "label !text-cream/60" %>
+          <%= form.select :target_score, Game::TARGET_SCORES.map { |score| [ t(".points", count: score), score ] }, {}, class: "field", data: { action: "autosubmit#submit" } %>
+        </div>
+      <% end %>
+      <%= button_to t(".start"), game_start_path(game), class: "btn btn-gold w-full text-2xl", disabled: game.present_seats.size < 2 %>
+      <% if game.present_seats.size < 2 %><p class="text-center text-sm text-cream/70"><%= t(".need_players") %></p><% end %>
+    <% else %>
+      <p class="text-center text-cream/80"><%= t(".waiting_for_host", host: game.host.name, timer: game.turn_seconds.zero? ? t(".no_timer") : t(".seconds", count: game.turn_seconds), target: game.target_score) %></p>
+    <% end %>
+
+    <% if seat %>
+      <div class="text-center">
+        <%= button_to t(".leave"), game_seat_path(game), method: :delete, class: "btn-ghost text-sm" %>
+      </div>
+    <% end %>
+  </section>
+</main>

@@ -1,0 +1,43 @@
+<div class="panel space-y-6">
+  <h2 class="text-3xl"><%= t("rules.title") %></h2>
+  <p class="max-w-3xl text-cream/85"><%= t("rules.goal") %></p>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="seat">
+      <h3 class="text-xl text-gold"><%= t("rules.turn_title") %></h3>
+      <p class="text-sm text-cream/80"><%= t("rules.turn") %></p>
+    </div>
+    <div class="seat">
+      <h3 class="text-xl text-gold"><%= t("rules.bust_title") %></h3>
+      <div class="hand my-1 justify-start"><%= card_tag "n8", size: :sm %><%= card_tag "n8", size: :sm, flag: "bust" %></div>
+      <p class="text-sm text-cream/80"><%= t("rules.bust") %></p>
+    </div>
+    <div class="seat">
+      <h3 class="text-xl text-gold"><%= t("rules.jackpot_title") %></h3>
+      <p class="text-sm text-cream/80"><%= t("rules.jackpot") %></p>
+    </div>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <% %w[ freeze triple chance mx2 ].each do |code| %>
+      <div class="seat flex-row items-start gap-4">
+        <%= card_tag code, size: :md %>
+        <div>
+          <h3 class="text-lg"><%= Gameplay::Card.new(code).label %></h3>
+          <p class="text-sm text-cream/80"><%= t("rules.cards.#{code}") %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="seat">
+      <h3 class="text-xl text-gold"><%= t("rules.scoring_title") %></h3>
+      <p class="text-sm text-cream/80"><%= t("rules.scoring") %></p>
+    </div>
+    <div class="seat">
+      <h3 class="text-xl text-gold"><%= t("rules.deck_title") %></h3>
+      <p class="text-sm text-cream/80"><%= t("rules.deck") %></p>
+    </div>
+  </div>
+</div>

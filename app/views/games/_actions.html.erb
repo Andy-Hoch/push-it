@@ -1,0 +1,36 @@
+<div class="flex flex-col items-center gap-3 pt-1" data-deal-target="controls">
+  <% if table.my_turn? %>
+    <div class="grid w-full max-w-xl grid-cols-2 gap-3">
+      <%= button_to game_hit_path(table.game), class: "btn btn-gold w-full text-xl sm:text-2xl", form: { class: "contents" } do %>
+        <%= t("games.actions.hit") %>
+      <% end %>
+      <%= button_to game_stay_path(table.game), class: "btn btn-cream w-full text-xl sm:text-2xl", disabled: player["cards"].empty?, form: { class: "contents" } do %>
+        <%= t("games.actions.stay", points: score["total"]) %>
+      <% end %>
+    </div>
+    <% if player["cards"].empty? %><p class="text-sm text-cream/70"><%= t("games.actions.must_hit") %></p><% end %>
+  <% elsif table.my_choice? %>
+    <div class="flex flex-col items-center gap-3 sm:flex-row">
+      <%= card_tag table.pending_card, size: :md %>
+      <div class="text-center sm:text-left">
+        <p class="font-display text-xl"><%= t("games.actions.choose", card: table.pending_card.label) %></p>
+        <p class="text-sm text-cream/75"><%= t("games.actions.choose_hint.#{table.pending_card.code}") %></p>
+      </div>
+    </div>
+    <div class="flex flex-wrap justify-center gap-2">
+      <% table.pending["eligible"].each do |id| %>
+        <% target = table.engine.player(id) %>
+        <%= button_to game_choice_path(table.game), params: { target_id: id }, class: "btn btn-cream !py-2 text-base" do %>
+          <%= avatar_tag table.name_for(target), classes: "!size-7 !text-sm" %>
+          <%= table.me?(target) ? t("games.actions.myself") : table.name_for(target) %>
+        <% end %>
+      <% end %>
+    </div>
+  <% elsif player["status"] == "busted" %>
+    <p class="font-display text-xl text-ember"><%= t("games.actions.busted") %></p>
+  <% elsif player["status"].in?(%w[ stayed frozen ]) && table.engine.in_round? %>
+    <p class="font-display text-xl text-gold"><%= t("games.actions.banked", points: score["total"]) %></p>
+  <% elsif table.engine.in_round? %>
+    <p class="text-cream/75"><%= t("games.actions.wait") %></p>
+  <% end %>
+</div>

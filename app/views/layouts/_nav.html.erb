@@ -1,0 +1,20 @@
+<nav class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
+  <%= link_to root_path, class: "logo text-3xl", aria: { label: t(".home") } do %>PUSH IT<% end %>
+
+  <div class="flex items-center gap-1 sm:gap-2">
+    <% if current_profile %>
+      <%= link_to profile_path, class: "btn-ghost !gap-2 font-sans font-extrabold" do %>
+        <%= avatar_tag current_profile.name, classes: "!size-8 !text-base" %>
+        <span class="hidden max-w-36 truncate sm:inline"><%= current_profile.name %></span>
+        <% if current_profile.guest? %><span class="badge badge-active"><%= t(".guest") %></span><% end %>
+      <% end %>
+    <% end %>
+
+    <% if authenticated? %>
+      <%= button_to t(".sign_out"), session_path, method: :delete, class: "btn-ghost text-sm" %>
+    <% else %>
+      <%= link_to t(".sign_in"), new_session_path, class: "btn-ghost text-sm" %>
+      <%= link_to t(".sign_up"), new_registration_path, class: "btn-ghost hidden text-sm sm:inline-flex" %>
+    <% end %>
+  </div>
+</nav>

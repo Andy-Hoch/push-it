@@ -1,0 +1,9 @@
+<% content_for :title, "Push It · #{@game.code}" %>
+<% turbo_refreshes_with method: :morph, scroll: :preserve %>
+<%= turbo_stream_from @game %>
+
+<% if @game.lobby? %>
+  <%= render "games/lobby", game: @game, seat: @seat %>
+<% else %>
+  <%= render "games/table", table: Game::Table.new(@game, @seat) %>
+<% end %>

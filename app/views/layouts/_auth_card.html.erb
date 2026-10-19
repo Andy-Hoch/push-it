@@ -1,0 +1,7 @@
+<main class="mx-auto max-w-md px-4 pt-6 pb-20">
+  <div class="paper">
+    <h1 class="text-4xl text-ink"><%= title %></h1>
+    <% if local_assigns[:subtitle] %><p class="mt-2 text-ink/70"><%= subtitle %></p><% end %>
+    <div class="mt-6"><%= yield %></div>
+  </div>
+</main>

@@ -1,0 +1,43 @@
+<% score = table.score(player) %>
+<section id="seat-<%= player["id"] %>" class="<%= class_names(seat_classes(table, player), "!p-4 sm:!p-5") %>">
+  <header class="flex flex-wrap items-center gap-3">
+    <%= avatar_tag table.name_for(player), classes: "!size-11 !text-xl" %>
+    <div class="min-w-0 flex-1">
+      <p class="flex items-center gap-2 truncate text-lg font-extrabold">
+        <span class="truncate"><%= table.name_for(player) %></span>
+        <span class="text-sm text-cream/60">(<%= t("games.you") %>)</span>
+        <% if table.dealer_id == player["id"] %><span class="dealer-chip" title="<%= t("games.dealer") %>">D</span><% end %>
+      </p>
+      <%= status_badge player %>
+    </div>
+    <div class="flex items-center gap-5 text-right leading-tight">
+      <div>
+        <p class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= t("games.this_round") %></p>
+        <p class="font-display text-3xl text-gold" data-deal-target="spoiler"><%= score["total"] %></p>
+      </div>
+      <div>
+        <p class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= t("games.total") %></p>
+        <p class="font-display text-3xl"><%= player["total"] %></p>
+      </div>
+    </div>
+  </header>
+
+  <div class="hand hand-spread min-h-6 gap-y-2">
+    <% table.specials(player).each do |entry| %>
+      <%= hand_entry_tag entry, size: :md %>
+    <% end %>
+  </div>
+  <div class="hand hand-spread !gap-[1.2cqi] gap-y-3">
+    <% numbers = table.numbers(player) %>
+    <% numbers.each do |entry| %>
+      <%= hand_entry_tag entry, size: :lg %>
+    <% end %>
+    <% (Gameplay::Engine::JACKPOT_SIZE - numbers.count { |entry| entry["flag"].nil? }).clamp(0, 7).times do %>
+      <div class="card card-slot card-lg"></div>
+    <% end %>
+  </div>
+
+  <div class="progress"><span style="width: <%= table.progress(player) %>%"></span></div>
+
+  <%= render "games/actions", table: table, player: player, score: score %>
+</section>

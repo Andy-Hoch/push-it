@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= content_for(:title) || "Push It" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#0a3a25">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Push It">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;800;900&display=swap">
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body data-controller="identity anchor"
+        data-action="click->anchor#scroll"
+        data-identity-snapshot-value="<%= (current_profile&.snapshot || {}).to_json %>"
+        data-identity-restore-url-value="<%= profile_restoration_path %>"
+        data-identity-signed-in-value="<%= authenticated?.present? %>">
+    <%= render "layouts/flash" %>
+    <%= render "layouts/nav" %>
+    <%= yield %>
+  </body>
+</html>
