@@ -1,5 +1,5 @@
 module CardsHelper
-  ACTION_ICONS = { "freeze" => "❄", "flip3" => "3", "chance" => "♥" }.freeze
+  ACTION_ICONS = { "freeze" => "❄", "triple" => "3", "chance" => "♥" }.freeze
 
   def card_tag(code, size: :md, flag: nil, uid: nil, style: nil, data: nil, classes: nil)
     card = code.is_a?(Gameplay::Card) ? code : Gameplay::Card.new(code)

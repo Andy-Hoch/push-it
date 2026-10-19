@@ -13,13 +13,13 @@
       <p class="text-sm text-cream/80"><%= t("rules.bust") %></p>
     </div>
     <div class="seat">
-      <h3 class="text-xl text-gold"><%= t("rules.flip7_title") %></h3>
-      <p class="text-sm text-cream/80"><%= t("rules.flip7") %></p>
+      <h3 class="text-xl text-gold"><%= t("rules.jackpot_title") %></h3>
+      <p class="text-sm text-cream/80"><%= t("rules.jackpot") %></p>
     </div>
   </div>
 
   <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-    <% %w[ freeze flip3 chance mx2 ].each do |code| %>
+    <% %w[ freeze triple chance mx2 ].each do |code| %>
       <div class="seat flex-row items-start gap-4">
         <%= card_tag code, size: :md %>
         <div>

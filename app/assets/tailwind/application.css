@@ -33,12 +33,12 @@
   --color-n11: #2357d6;
   --color-n12: #5b4632;
 
-  --animate-flip-in: flip-in 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+  --animate-deal-in: deal-in 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
   --animate-shake: shake 0.5s ease-in-out 0.45s both;
   --animate-pulse-ring: pulse-ring 1.6s ease-out infinite;
 }
 
-@keyframes flip-in {
+@keyframes deal-in {
   0% { transform: translateY(-36px) rotateY(100deg) scale(0.85); opacity: 0; }
   60% { opacity: 1; }
   100% { transform: none; opacity: 1; }
@@ -168,7 +168,7 @@
   .badge-stayed { @apply bg-gold text-ink; }
   .badge-frozen { @apply bg-ice text-ink; }
   .badge-busted { @apply bg-ember text-white; }
-  .badge-flip7 { @apply bg-white text-ember; }
+  .badge-jackpot { @apply bg-white text-ember; }
   .badge-out { @apply bg-black/40 text-cream/60; }
 
   .avatar {
@@ -206,7 +206,7 @@
       inset 0 0 0 calc(var(--w) * 0.05) color-mix(in srgb, var(--ink) 70%, transparent),
       0 1px 1px rgb(0 0 0 / 0.25),
       0 6px 14px rgb(0 0 0 / 0.35);
-    animation: var(--animate-flip-in);
+    animation: var(--animate-deal-in);
     transform-origin: 50% 60%;
     backface-visibility: hidden;
     user-select: none;
@@ -259,7 +259,7 @@
     --ink: #0c5f8e;
     background: radial-gradient(circle at 50% 35%, #bfe9ff, var(--color-ice) 55%, #1b74ad);
   }
-  .card-flip3 {
+  .card-triple {
     --ink: #9b1544;
     background: radial-gradient(circle at 50% 35%, #ffb3c8, #ee4b7a 55%, #b0174a);
   }
@@ -269,7 +269,7 @@
   }
 
   .card.is-bust {
-    animation: var(--animate-flip-in), var(--animate-shake);
+    animation: var(--animate-deal-in), var(--animate-shake);
     box-shadow:
       inset 0 0 0 calc(var(--w) * 0.035) #fff,
       0 0 0 3px var(--color-ember),
@@ -301,7 +301,7 @@
       0 6px 14px rgb(0 0 0 / 0.35);
   }
   .card-back::before {
-    content: "FLIP 7";
+    content: "PUSH IT";
     font-size: 0.9em;
     color: var(--color-gold);
     text-shadow: 0 2px 0 #7a1608;

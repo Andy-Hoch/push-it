@@ -17,7 +17,7 @@
 
       <dl class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <% { games_played: @profile.games_played, games_won: @profile.games_won, win_rate: "#{@profile.win_rate} %",
-             flip7_count: @profile.flip7_count, best_round: @profile.best_round, total_points: @profile.total_points }.each do |stat, value| %>
+             jackpot_count: @profile.jackpot_count, best_round: @profile.best_round, total_points: @profile.total_points }.each do |stat, value| %>
           <div class="seat items-center text-center">
             <dt class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= t(".stats.#{stat}") %></dt>
             <dd class="font-display text-4xl text-gold"><%= value %></dd>

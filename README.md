@@ -1,22 +1,22 @@
-# Flip 7
+# Push It
 
-Das Kartenspiel *Flip 7* (The Op Games) als Multiplayer-Web-App mit Rails 8.1, Hotwire und SQLite.
+*Push It* ist ein Push-your-luck-Kartenspiel als Multiplayer-Web-App mit Rails 8.1, Hotwire und SQLite.
 
 - Spielen als Gast: Name eingeben, Tisch eröffnen, den 6-stelligen Einladungscode oder Link teilen.
 - Echtzeit-Updates per Turbo-Morphing über Solid Cable, also ohne Redis.
 - Optionaler Account: vor, während oder nach einer Partie anlegen. Das Gastprofil mit Statistik und laufenden Partien wird übernommen.
-- Gastprofile werden im Local Storage gespiegelt (`flip7.profile`). Fehlt das Cookie, stellt der Browser das Profil darüber wieder her.
+- Gastprofile werden im Local Storage gespiegelt (`pushit.profile`). Fehlt das Cookie, stellt der Browser das Profil darüber wieder her.
 - Zug-Timer: Wer zu lange braucht, bleibt automatisch stehen bzw. wählt ein Standard-Ziel (`TurnTimeoutJob`). Die nächste Runde startet automatisch.
 
 ## Regeln (vollständig umgesetzt)
 
 Die Regeln stecken in `app/models/gameplay/` als reines Ruby ohne Datenbank:
 
-- **Deck**: 94 Karten, nämlich 0 bis 12 (die Zahl n kommt n-mal vor, die 0 einmal), +2/+4/+6/+8/+10, ×2 und je drei Freeze, Flip Three und Second Chance.
-- **Spielablauf**: Hit oder Stay. Eine doppelte Zahl bedeutet Bust und 0 Punkte. 7 verschiedene Zahlen ergeben Flip 7, das beendet die Runde und gibt +15 Punkte.
-- **Wertung**: Zahlen addieren, mit ×2 verdoppeln, dann die Modifikatoren und den Flip-7-Bonus addieren.
-- **Freeze und Flip Three** gehen auf einen beliebigen aktiven Spieler, auch auf einen selbst.
-  - Aktionskarten, die während Flip Three gezogen werden, wirken erst nach den drei Karten.
+- **Deck**: 94 Karten, nämlich 0 bis 12 (die Zahl n kommt n-mal vor, die 0 einmal), +2/+4/+6/+8/+10, ×2 und je drei Freeze, Dreierlei und Second Chance.
+- **Spielablauf**: Hit oder Stay. Eine doppelte Zahl bedeutet Bust und 0 Punkte. 7 verschiedene Zahlen ergeben den Jackpot. Das beendet die Runde und gibt +15 Punkte.
+- **Wertung**: Zahlen addieren, mit ×2 verdoppeln, dann die Modifikatoren und den Jackpot-Bonus addieren.
+- **Freeze und Dreierlei** gehen auf einen beliebigen aktiven Spieler, auch auf einen selbst.
+  - Aktionskarten, die während Dreierlei gezogen werden, wirken erst nach den drei Karten.
   - Busted das Ziel, verfallen sie.
 - **Second Chance**:
   - Man darf nur eine besitzen. Eine zweite muss man weitergeben, sonst wird sie abgeworfen.

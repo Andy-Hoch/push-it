@@ -1,4 +1,4 @@
-# Choosing who receives a Freeze, Flip Three or an extra Second Chance.
+# Choosing who receives a Freeze, Dreierlei or an extra Second Chance.
 class Games::ChoicesController < ApplicationController
   include GameScoped
   before_action :set_seat

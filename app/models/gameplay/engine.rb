@@ -1,4 +1,4 @@
-# The Flip 7 state machine. It works on a plain Hash (persisted as JSON on Game)
+# The Push It state machine. It works on a plain Hash (persisted as JSON on Game)
 # and advances an agenda of steps until a player has to decide something; that
 # decision is exposed as `pending`:
 #
@@ -8,9 +8,9 @@
 #
 # Hand entries are { "code", "uid", "flag" } where flag is nil, "bust" (the
 # duplicate that busted the player) or "held" (an action card set aside while
-# resolving a Flip Three).
+# resolving a Dreierlei).
 class Gameplay::Engine
-  FLIP_SEVEN = 7
+  JACKPOT_SIZE = 7
   TARGET_SCORE = 200
   LOG_LIMIT = 80
 
@@ -27,7 +27,7 @@ class Gameplay::Engine
       "discard" => [],
       "players" => players.map do |player|
         { "id" => player.fetch(:id), "name" => player.fetch(:name), "total" => 0, "cards" => [], "status" => "waiting",
-          "left" => false, "dealt" => false, "flip7" => false, "flip7s" => 0, "best" => 0, "round_score" => nil }
+          "left" => false, "dealt" => false, "jackpot" => false, "jackpots" => 0, "best" => 0, "round_score" => nil }
       end,
       "agenda" => [],
       "pending" => nil,
@@ -91,7 +91,7 @@ class Gameplay::Engine
   def projected_score(player)
     return Gameplay::RoundScore.busted if player["status"] == "busted"
 
-    Gameplay::RoundScore.new(player["cards"].reject { |entry| entry["flag"] }.map { |entry| entry["code"] }, flip_seven: player["flip7"]).to_h
+    Gameplay::RoundScore.new(player["cards"].reject { |entry| entry["flag"] }.map { |entry| entry["code"] }, jackpot: player["jackpot"]).to_h
   end
 
   # -- Commands --------------------------------------------------------------
@@ -106,7 +106,7 @@ class Gameplay::Engine
     state["round"] += 1
     state["dealer"] = state["dealer"] ? next_player_after(state["dealer"]) { |player| !player["left"] }["id"] : contenders.first["id"]
     players.each do |player|
-      player.merge!("cards" => [], "status" => player["left"] ? "out" : "active", "dealt" => false, "flip7" => false, "round_score" => nil)
+      player.merge!("cards" => [], "status" => player["left"] ? "out" : "active", "dealt" => false, "jackpot" => false, "round_score" => nil)
     end
     state["phase"] = "dealing"
     state["pending"] = nil
@@ -212,7 +212,7 @@ class Gameplay::Engine
       state["pending"] = { "type" => "turn", "player" => player["id"] }
     end
 
-    def step_flip3(step)
+    def step_triple(step)
       target = player(step["target"])
       return unless active?(target) # busted mid-way: set-aside actions are simply discarded with the table
 
@@ -222,7 +222,7 @@ class Gameplay::Engine
         held.reverse_each { |entry| agenda.unshift({ "do" => "action", "card" => entry["code"], "owner" => target["id"] }) }
       else
         agenda.unshift(step.merge("left" => step["left"] - 1))
-        draw_for(target, context: "flip3")
+        draw_for(target, context: "triple")
       end
     end
 
@@ -262,7 +262,7 @@ class Gameplay::Engine
         write_log :drew, player: player["name"], card: card.label
       elsif card.second_chance?
         receive_second_chance(player, entry)
-      elsif context == "flip3"
+      elsif context == "triple"
         player["cards"] << entry.merge("flag" => "held")
         write_log :held, player: player["name"], card: card.label
       else
@@ -285,7 +285,7 @@ class Gameplay::Engine
       else
         player["cards"] << entry
         write_log :drew, player: player["name"], card: card.label
-        flip_seven(player) if numbers_of(player).size >= FLIP_SEVEN
+        hit_jackpot(player) if numbers_of(player).size >= JACKPOT_SIZE
       end
     end
 
@@ -317,9 +317,9 @@ class Gameplay::Engine
       when "freeze"
         target["status"] = "frozen"
         write_log :froze, **names, points: projected_score(target)["total"]
-      when "flip3"
-        write_log :flip_three, **names
-        agenda.unshift({ "do" => "flip3", "target" => target["id"], "left" => 3 })
+      when "triple"
+        write_log :triple, **names
+        agenda.unshift({ "do" => "triple", "target" => target["id"], "left" => 3 })
       when "chance"
         write_log :gave_chance, **names
       end
@@ -364,10 +364,10 @@ class Gameplay::Engine
 
     # -- Round & game ----------------------------------------------------------
 
-    def flip_seven(player)
-      player["flip7"] = true
-      player["flip7s"] += 1
-      write_log :flip_seven, player: player["name"]
+    def hit_jackpot(player)
+      player["jackpot"] = true
+      player["jackpots"] += 1
+      write_log :jackpot, player: player["name"]
       end_round
     end
 

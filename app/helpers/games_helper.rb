@@ -4,8 +4,8 @@ module GamesHelper
   end
 
   def status_badge(player)
-    if player["flip7"]
-      tag.span(t("games.status.flip7"), class: "badge badge-flip7")
+    if player["jackpot"]
+      tag.span(t("games.status.jackpot"), class: "badge badge-jackpot")
     else
       tag.span(t("games.status.#{player["status"]}"), class: "badge badge-#{player["status"]}")
     end

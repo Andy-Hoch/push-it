@@ -1,4 +1,4 @@
-# Pure-Ruby rules of Flip 7. Nothing in here touches the database.
+# Pure-Ruby rules of Push It. Nothing in here touches the database.
 module Gameplay
   class IllegalMove < StandardError
     attr_reader :reason

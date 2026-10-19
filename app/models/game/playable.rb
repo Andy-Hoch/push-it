@@ -92,7 +92,7 @@ module Game::Playable
 
       engine.players.each do |player|
         seat = seats.find { |candidate| candidate.id == player["id"] }
-        seat&.profile&.record_game!(won: seat.profile == winner, flip7s: player["flip7s"], best_round: player["best"], points: player["total"])
+        seat&.profile&.record_game!(won: seat.profile == winner, jackpots: player["jackpots"], best_round: player["best"], points: player["total"])
       end
     end
 end

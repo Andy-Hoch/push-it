@@ -32,7 +32,7 @@
     <% numbers.each do |entry| %>
       <%= hand_entry_tag entry, size: :lg %>
     <% end %>
-    <% (Gameplay::Engine::FLIP_SEVEN - numbers.count { |entry| entry["flag"].nil? }).clamp(0, 7).times do %>
+    <% (Gameplay::Engine::JACKPOT_SIZE - numbers.count { |entry| entry["flag"].nil? }).clamp(0, 7).times do %>
       <div class="card card-slot card-lg"></div>
     <% end %>
   </div>

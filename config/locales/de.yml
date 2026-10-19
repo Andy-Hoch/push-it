@@ -13,7 +13,7 @@ de:
   gameplay:
     cards:
       freeze: Freeze
-      flip3: Flip Three
+      triple: Dreierlei
       chance: Second Chance
     errors:
       not_seated: Du sitzt nicht an diesem Tisch.
@@ -35,17 +35,17 @@ de:
     stayed: "%{player} bleibt stehen und sichert %{points} Punkte."
     drew: "%{player} deckt %{card} auf."
     drew_action: "%{player} deckt %{card} auf!"
-    held: "%{player} legt %{card} beiseite – sie wird nach Flip Three gespielt."
+    held: "%{player} legt %{card} beiseite – sie wird nach Dreierlei gespielt."
     saved: "%{player} rettet sich mit Second Chance vor der doppelten %{card}!"
     busted: "%{player} hat die %{card} doppelt – Bust!"
     extra_chance: "%{player} hat schon eine Second Chance und muss die neue weitergeben."
     chance_discarded: "Niemand kann die Second Chance von %{player} annehmen – sie wird abgeworfen."
     forced: "%{card} von %{player} hat nur ein mögliches Ziel."
     froze: "%{player} friert %{target} ein – %{points} Punkte gesichert."
-    flip_three: "%{player} spielt Flip Three auf %{target}."
+    triple: "%{player} spielt Dreierlei auf %{target}."
     gave_chance: "%{player} gibt %{target} eine Second Chance."
     reshuffled: "Der Nachziehstapel ist leer – der Ablagestapel wird neu gemischt."
-    flip_seven: "FLIP 7! %{player} hat sieben verschiedene Zahlen!"
+    jackpot: "JACKPOT! %{player} hat sieben verschiedene Zahlen!"
     deck_exhausted: "Keine Karten mehr – die Runde endet."
     round_scored: "Runde %{round} ist gewertet."
     tie_break: "Gleichstand an der Spitze – es wird weitergespielt, bis einer allein vorne liegt!"
@@ -75,21 +75,21 @@ de:
       open_games: Deine offenen Partien
 
   rules:
-    title: So wird Flip 7 gespielt
+    title: So wird Push It gespielt
     goal: Wer am Ende einer Runde als Erster mindestens 200 Punkte hat, gewinnt – bei Gleichstand an der Spitze geht es weiter. Jede Runde teilt der Dealer jedem eine offene Karte aus, dann entscheidet reihum jeder, ob er noch eine Karte zieht oder stehen bleibt.
     turn_title: Ziehen oder stehen bleiben
     turn: Zieh so viele Karten wie du willst. Bleibst du stehen, sicherst du deine Punkte für diese Runde. Ohne Karte vor dir musst du ziehen.
     bust_title: Bust!
     bust: Ziehst du eine Zahl, die du schon hast, bist du raus und bekommst in dieser Runde 0 Punkte – auch Bonuskarten helfen dann nicht.
-    flip7_title: Flip 7
-    flip7: Sieben verschiedene Zahlen (die 0 zählt mit) beenden die Runde sofort und bringen 15 Bonuspunkte. Alle anderen werten ihre Karten.
+    jackpot_title: Jackpot
+    jackpot: Sieben verschiedene Zahlen (die 0 zählt mit) beenden die Runde sofort und bringen 15 Bonuspunkte. Alle anderen werten ihre Karten.
     scoring_title: Wertung
-    scoring: Zahlen addieren, mit ×2 verdoppeln (nur die Zahlen), dann +2 bis +10 dazu, dann +15 für Flip 7.
+    scoring: Zahlen addieren, mit ×2 verdoppeln (nur die Zahlen), dann +2 bis +10 dazu, dann +15 für den Jackpot.
     deck_title: Das Deck
-    deck: "94 Karten: einmal die 0 und die 1, zweimal die 2 … zwölfmal die 12, dazu +2, +4, +6, +8, +10, ×2 und je drei Freeze, Flip Three und Second Chance. Zwischen den Runden wird nicht gemischt."
+    deck: "94 Karten: einmal die 0 und die 1, zweimal die 2 … zwölfmal die 12, dazu +2, +4, +6, +8, +10, ×2 und je drei Freeze, Dreierlei und Second Chance. Zwischen den Runden wird nicht gemischt."
     cards:
       freeze: Gib sie einem aktiven Spieler (auch dir selbst) – er sichert sofort seine Punkte und ist für die Runde raus.
-      flip3: Der gewählte Spieler muss drei Karten nacheinander aufdecken. Dabei gezogene Freeze- und Flip-Three-Karten werden erst danach gespielt.
+      triple: Der gewählte Spieler muss drei Karten nacheinander aufdecken. Dabei gezogene Freeze- und Dreierlei-Karten werden erst danach gespielt.
       chance: Schützt einmal vor einer doppelten Zahl – beide Karten werden abgeworfen. Du darfst nur eine haben, eine zweite musst du weitergeben.
       mx2: Verdoppelt die Summe deiner Zahlenkarten. Die anderen Bonuskarten werden danach addiert.
 
@@ -106,7 +106,7 @@ de:
         games_played: Spiele
         games_won: Siege
         win_rate: Siegquote
-        flip7_count: Flip 7s
+        jackpot_count: Jackpots
         best_round: Beste Runde
         total_points: Punkte gesamt
       name_title: Dein Name
@@ -159,7 +159,7 @@ de:
 
   passwords_mailer:
     reset:
-      subject: Passwort für Flip 7 zurücksetzen
+      subject: Passwort für Push It zurücksetzen
       link: diese Seite
       body_html: Du kannst dein Passwort über %{link} zurücksetzen. Der Link ist %{expires} gültig.
       body_text: "Du kannst dein Passwort hier zurücksetzen: %{url} – der Link ist %{expires} gültig."
@@ -179,7 +179,7 @@ de:
       busted: Bust
       out: Ausgesetzt
       waiting: Wartet
-      flip7: Flip 7!
+      jackpot: Jackpot!
       left: Gegangen
     status_line:
       your_turn: Du bist dran!
@@ -208,7 +208,7 @@ de:
       wait: Warte, bis du dran bist …
       choose_hint:
         freeze: Der Spieler sichert sofort seine Punkte und ist für die Runde raus.
-        flip3: Der Spieler muss drei Karten nacheinander aufdecken.
+        triple: Der Spieler muss drei Karten nacheinander aufdecken.
         chance: Du hast schon eine – gib sie einem Spieler ohne Second Chance.
     lobby:
       invite_code: Einladungscode

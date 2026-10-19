@@ -1,17 +1,17 @@
 # Scoring order from the rulebook: add the number cards, double that sum for ×2,
-# then add the + modifiers, then 15 bonus points for flipping seven numbers.
+# then add the + modifiers, then 15 bonus points for a jackpot of seven numbers.
 class Gameplay::RoundScore
-  FLIP_SEVEN_BONUS = 15
+  JACKPOT_BONUS = 15
 
   attr_reader :numbers, :modifiers, :bonus
 
-  def initialize(codes, flip_seven: false)
+  def initialize(codes, jackpot: false)
     cards = codes.map { |code| Gameplay::Card.new(code) }
 
     @numbers = cards.select(&:number?).sum(&:value)
     @doubled = cards.any?(&:multiplier?)
     @modifiers = cards.sum(&:bonus)
-    @bonus = flip_seven ? FLIP_SEVEN_BONUS : 0
+    @bonus = jackpot ? JACKPOT_BONUS : 0
   end
 
   def doubled?

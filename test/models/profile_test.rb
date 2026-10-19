@@ -11,14 +11,14 @@ class ProfileTest < ActiveSupport::TestCase
 
   test "claiming into an existing profile merges stats and seats" do
     account = users(:one).create_profile!(name: "Kim", games_played: 3, best_round: 40)
-    guest = Profile.create!(name: "Gast", games_played: 2, best_round: 55, flip7_count: 1)
+    guest = Profile.create!(name: "Gast", games_played: 2, best_round: 55, jackpot_count: 1)
     game = Game.open_for!(guest)
 
     assert_equal account, guest.claim_for(users(:one))
     account.reload
     assert_equal 5, account.games_played
     assert_equal 55, account.best_round
-    assert_equal 1, account.flip7_count
+    assert_equal 1, account.jackpot_count
     assert_equal account, game.reload.host
     assert_equal [ account ], game.profiles
     assert_not Profile.exists?(guest.id)

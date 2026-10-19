@@ -26,7 +26,7 @@ module Profile::Claimable
     update!(
       games_played: games_played + guest.games_played,
       games_won: games_won + guest.games_won,
-      flip7_count: flip7_count + guest.flip7_count,
+      jackpot_count: jackpot_count + guest.jackpot_count,
       best_round: [ best_round, guest.best_round ].max,
       total_points: total_points + guest.total_points
     )

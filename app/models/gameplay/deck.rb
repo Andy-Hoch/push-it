@@ -1,5 +1,5 @@
-# The 94-card Flip 7 deck: 79 number cards (one 0, one 1, two 2s ... twelve 12s),
-# six score modifiers and three each of Freeze, Flip Three and Second Chance.
+# The 94-card Push It deck: 79 number cards (one 0, one 1, two 2s ... twelve 12s),
+# six score modifiers and three each of Freeze, Dreierlei and Second Chance.
 module Gameplay::Deck
   SIZE = 94
 

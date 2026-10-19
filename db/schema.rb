@@ -35,7 +35,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_071958) do
     t.integer "user_id"
     t.integer "games_played", default: 0, null: false
     t.integer "games_won", default: 0, null: false
-    t.integer "flip7_count", default: 0, null: false
+    t.integer "jackpot_count", default: 0, null: false
     t.integer "best_round", default: 0, null: false
     t.integer "total_points", default: 0, null: false
     t.datetime "created_at", null: false

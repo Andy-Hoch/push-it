@@ -1,8 +1,8 @@
 # A single card, encoded as a short string so game state stays plain JSON:
 # "n0".."n12" number cards, "m+2".."m+10" and "mx2" score modifiers,
-# "freeze", "flip3" and "chance" (Second Chance) action cards.
+# "freeze", "triple" and "chance" (Second Chance) action cards.
 class Gameplay::Card
-  ACTIONS = %w[ freeze flip3 chance ].freeze
+  ACTIONS = %w[ freeze triple chance ].freeze
   MODIFIERS = %w[ m+2 m+4 m+6 m+8 m+10 mx2 ].freeze
 
   attr_reader :code
@@ -31,8 +31,8 @@ class Gameplay::Card
     code == "freeze"
   end
 
-  def flip_three?
-    code == "flip3"
+  def triple?
+    code == "triple"
   end
 
   def second_chance?

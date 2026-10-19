@@ -29,12 +29,12 @@ class Gameplay::EngineTest < ActiveSupport::TestCase
     assert_equal 79, cards.count { |code| Gameplay::Card.new(code).number? }
     assert_equal 6, cards.count { |code| Gameplay::Card.new(code).modifier? }
     assert_equal 3, cards.count("freeze")
-    assert_equal 3, cards.count("flip3")
+    assert_equal 3, cards.count("triple")
     assert_equal 3, cards.count("chance")
   end
 
-  test "x2 doubles only the number cards, then modifiers and the flip 7 bonus are added" do
-    score = Gameplay::RoundScore.new(%w[ n12 n10 n6 mx2 m+4 ], flip_seven: true)
+  test "x2 doubles only the number cards, then modifiers and the jackpot bonus are added" do
+    score = Gameplay::RoundScore.new(%w[ n12 n10 n6 mx2 m+4 ], jackpot: true)
 
     assert_equal 28, score.numbers
     assert_equal 28 * 2 + 4 + 15, score.total
@@ -95,7 +95,7 @@ class Gameplay::EngineTest < ActiveSupport::TestCase
     5.times { engine.hit(BEN) }
 
     assert_equal "round_over", engine.phase
-    assert engine.player(BEN)["flip7"]
+    assert engine.player(BEN)["jackpot"]
     assert_equal (0..6).sum + 15, engine.player(BEN)["total"]
     assert_equal 7, engine.player(ANNA)["total"], "players who stayed still score"
   end
@@ -132,54 +132,54 @@ class Gameplay::EngineTest < ActiveSupport::TestCase
     assert_includes codes(engine, ANNA), "freeze"
   end
 
-  test "flip three makes the target take three cards one at a time" do
-    engine = engine_with(%w[ n5 n6 n7 flip3 n1 n2 n3 ])
+  test "triple makes the target take three cards one at a time" do
+    engine = engine_with(%w[ n5 n6 n7 triple n1 n2 n3 ])
     engine.hit(BEN)
     engine.choose(BEN, CARLA)
 
-    assert_equal %w[ n6 flip3 n1 n2 n3 ], codes(engine, CARLA)
+    assert_equal %w[ n6 triple n1 n2 n3 ], codes(engine, CARLA)
     assert_equal CARLA, engine.pending["player"], "turn order continues after Ben"
   end
 
-  test "flip three stops as soon as the target busts" do
-    engine = engine_with(%w[ n5 n6 n7 flip3 n1 n6 n3 ])
+  test "triple stops as soon as the target busts" do
+    engine = engine_with(%w[ n5 n6 n7 triple n1 n6 n3 ])
     engine.hit(BEN)
     engine.choose(BEN, CARLA)
 
     assert_equal "busted", status(engine, CARLA)
-    assert_equal %w[ n6 flip3 n1 n6 ], codes(engine, CARLA)
+    assert_equal %w[ n6 triple n1 n6 ], codes(engine, CARLA)
     assert_equal "n3", engine.state["deck"].first
   end
 
-  test "flip three stops when the target reaches flip 7" do
-    engine = engine_with(%w[ n1 n2 n3 n4 n5 n6 flip3 n7 n8 n9 ], players: [ ANNA, BEN ])
+  test "triple stops when the target hits the jackpot" do
+    engine = engine_with(%w[ n1 n2 n3 n4 n5 n6 triple n7 n8 n9 ], players: [ ANNA, BEN ])
     engine.hit(BEN) # n3
     engine.stay(ANNA)
     3.times { engine.hit(BEN) } # n4 n5 n6
-    engine.hit(BEN) # flip3, Ben is the only active player
+    engine.hit(BEN) # triple, Ben is the only active player
 
     assert_equal "round_over", engine.phase
-    assert engine.player(BEN)["flip7"]
-    assert_equal %w[ n1 n3 n4 n5 n6 flip3 n7 n8 ], codes(engine, BEN)
+    assert engine.player(BEN)["jackpot"]
+    assert_equal %w[ n1 n3 n4 n5 n6 triple n7 n8 ], codes(engine, BEN)
     assert_equal "n9", engine.state["deck"].first
   end
 
-  test "freeze drawn during flip three waits until all three cards are flipped" do
-    engine = engine_with(%w[ n5 n6 n7 flip3 n1 freeze n3 ])
+  test "freeze drawn during triple waits until all three cards are drawn" do
+    engine = engine_with(%w[ n5 n6 n7 triple n1 freeze n3 ])
     engine.hit(BEN)
     engine.choose(BEN, CARLA)
 
-    assert_equal %w[ n6 flip3 n1 n3 ], codes(engine, CARLA), "the held freeze is taken back into play"
+    assert_equal %w[ n6 triple n1 n3 ], codes(engine, CARLA), "the held freeze is taken back into play"
     assert_equal({ "type" => "target", "player" => CARLA, "card" => "freeze", "eligible" => [ ANNA, BEN, CARLA ] }, engine.pending)
 
     engine.choose(CARLA, ANNA)
     assert_equal "frozen", status(engine, ANNA)
-    assert_equal %w[ n6 flip3 n1 n3 ], codes(engine, CARLA)
+    assert_equal %w[ n6 triple n1 n3 ], codes(engine, CARLA)
     assert_equal CARLA, engine.pending["player"]
   end
 
-  test "held action cards are void when the flip three target busts" do
-    engine = engine_with(%w[ n5 n6 n7 flip3 flip3 n6 n3 ])
+  test "held action cards are void when the triple target busts" do
+    engine = engine_with(%w[ n5 n6 n7 triple triple n6 n3 ])
     engine.hit(BEN)
     engine.choose(BEN, CARLA)
 
@@ -188,13 +188,13 @@ class Gameplay::EngineTest < ActiveSupport::TestCase
     assert_equal({ "type" => "turn", "player" => ANNA }, engine.pending)
   end
 
-  test "a second flip three drawn during flip three is resolved afterwards and chains" do
-    engine = engine_with(%w[ n5 n6 n7 flip3 flip3 n1 n2 n3 n4 n8 ])
+  test "a second triple drawn during triple is resolved afterwards and chains" do
+    engine = engine_with(%w[ n5 n6 n7 triple triple n1 n2 n3 n4 n8 ])
     engine.hit(BEN)
     engine.choose(BEN, CARLA)
     engine.choose(CARLA, ANNA)
 
-    assert_equal %w[ n7 flip3 n3 n4 n8 ], codes(engine, ANNA)
+    assert_equal %w[ n7 triple n3 n4 n8 ], codes(engine, ANNA)
   end
 
   test "second chance cancels a duplicate and ends the turn" do
@@ -209,13 +209,13 @@ class Gameplay::EngineTest < ActiveSupport::TestCase
     assert_equal [ "chance", "n5" ], engine.state["discard"].last(2)
   end
 
-  test "second chance saves a player during flip three and the draw continues" do
-    engine = engine_with(%w[ n5 n6 n7 flip3 chance n6 n9 ])
+  test "second chance saves a player during triple and the draw continues" do
+    engine = engine_with(%w[ n5 n6 n7 triple chance n6 n9 ])
     engine.hit(BEN)
     engine.choose(BEN, CARLA)
 
     assert_equal "active", status(engine, CARLA)
-    assert_equal %w[ n6 flip3 n9 ], codes(engine, CARLA)
+    assert_equal %w[ n6 triple n9 ], codes(engine, CARLA)
   end
 
   test "a second second chance must be given to an active player without one" do

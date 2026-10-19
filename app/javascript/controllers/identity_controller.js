@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Mirrors the current profile into localStorage, and restores a guest profile from
 // it when the browser lost its cookie (new session, cleared cookies, other device copy).
-const STORAGE_KEY = "flip7.profile"
+const STORAGE_KEY = "pushit.profile"
 
 export default class extends Controller {
   static values = { snapshot: Object, restoreUrl: String, signedIn: Boolean }
@@ -27,9 +27,9 @@ export default class extends Controller {
 
   async restore() {
     const stored = this.read()
-    if (!stored?.token || sessionStorage.getItem("flip7.restoring")) return
+    if (!stored?.token || sessionStorage.getItem("pushit.restoring")) return
 
-    sessionStorage.setItem("flip7.restoring", "1")
+    sessionStorage.setItem("pushit.restoring", "1")
     try {
       const response = await fetch(this.restoreUrlValue, {
         method: "POST",
@@ -45,7 +45,7 @@ export default class extends Controller {
         }
       }
     } finally {
-      sessionStorage.removeItem("flip7.restoring")
+      sessionStorage.removeItem("pushit.restoring")
     }
   }
 

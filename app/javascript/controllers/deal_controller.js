@@ -6,7 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 // Web Animations API, so Turbo morphs (which sync attributes) never restart it.
 const STEP = 350
 const FLIGHT = 420
-const FLIP = 260
+const TURN = 260
 const MAX_TOTAL = 4000
 const GLOW = "inset 0 0 0 2px #f6b80a, 0 0 26px rgb(246 184 10 / 0.55)"
 const SHAKE = [
@@ -66,7 +66,7 @@ export default class extends Controller {
 
     cards.forEach((card, index) => setTimeout(() => this.deal(card), start + index * step - now))
     this.nextSlot = start + cards.length * step
-    this.dealingUntil = this.nextSlot - step + FLIGHT + FLIP
+    this.dealingUntil = this.nextSlot - step + FLIGHT + TURN
     this.controlsTargets.forEach((controls) => this.hold(controls, { inert: true }))
     this.spoilerTargets.forEach((spoiler) => this.hold(spoiler))
   }
@@ -102,20 +102,20 @@ export default class extends Controller {
     if (!card.isConnected) return
 
     const rest = getComputedStyle(card).transform
-    const flip = card.animate([
+    const turn = card.animate([
       { transform: "perspective(600px) rotateY(90deg)", opacity: 0.7 },
       { transform: rest === "none" ? "none" : rest, opacity: 1 }
-    ], { duration: this.reducedMotion ? 150 : FLIP, easing: "ease-out" })
+    ], { duration: this.reducedMotion ? 150 : TURN, easing: "ease-out" })
 
     if (card.classList.contains("is-bust")) {
-      flip.finished.then(() => card.animate(SHAKE, { duration: 500, easing: "ease-in-out" })).catch(() => {})
+      turn.finished.then(() => card.animate(SHAKE, { duration: 500, easing: "ease-in-out" })).catch(() => {})
     }
   }
 
   highlight(seat) {
     if (!seat || this.reducedMotion) return
 
-    seat.animate([{ boxShadow: GLOW }, { boxShadow: getComputedStyle(seat).boxShadow }], { duration: FLIGHT + FLIP + 300, easing: "ease-out" })
+    seat.animate([{ boxShadow: GLOW }, { boxShadow: getComputedStyle(seat).boxShadow }], { duration: FLIGHT + TURN + 300, easing: "ease-out" })
   }
 
   // Until the cards have landed nobody can hit or stay, and scores and the log
@@ -143,6 +143,6 @@ export default class extends Controller {
   }
 
   get storageKey() {
-    return `flip7.dealt.${this.gameValue}`
+    return `pushit.dealt.${this.gameValue}`
   }
 }

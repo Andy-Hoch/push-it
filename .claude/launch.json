@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "flip7",
+      "name": "jackpot",
       "runtimeExecutable": "bin/dev",
       "runtimeArgs": [],
       "port": 3000

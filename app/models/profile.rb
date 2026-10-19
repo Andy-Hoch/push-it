@@ -3,7 +3,7 @@
 class Profile < ApplicationRecord
   include Claimable
 
-  STATS = %w[ games_played games_won flip7_count best_round total_points ].freeze
+  STATS = %w[ games_played games_won jackpot_count best_round total_points ].freeze
 
   belongs_to :user, optional: true
   has_many :seats, dependent: :destroy
@@ -40,11 +40,11 @@ class Profile < ApplicationRecord
     games.finished.order(finished_at: :desc)
   end
 
-  def record_game!(won:, flip7s:, best_round:, points:)
+  def record_game!(won:, jackpots:, best_round:, points:)
     update!(
       games_played: games_played + 1,
       games_won: games_won + (won ? 1 : 0),
-      flip7_count: flip7_count + flip7s,
+      jackpot_count: jackpot_count + jackpots,
       best_round: [ self.best_round, best_round ].max,
       total_points: total_points + points
     )
