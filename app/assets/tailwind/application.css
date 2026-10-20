@@ -307,8 +307,11 @@
       0 6px 14px rgb(0 0 0 / 0.35);
   }
   .card-back::before {
-    content: "PUSH IT";
-    font-size: 0.9em;
+    content: "PUSH\A YOUR\A LUCK";
+    white-space: pre;
+    text-align: center;
+    line-height: 1;
+    font-size: 0.6em;
     color: var(--color-gold);
     text-shadow: 0 2px 0 #7a1608;
     transform: rotate(-18deg);

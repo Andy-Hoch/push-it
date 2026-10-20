@@ -1,4 +1,4 @@
-<% content_for :title, "Push It · #{@game.code}" %>
+<% content_for :title, "Push your Luck · #{@game.code}" %>
 <% turbo_refreshes_with method: :morph, scroll: :preserve %>
 <%= turbo_stream_from @game %>
 
