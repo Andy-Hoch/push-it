@@ -93,6 +93,45 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "account links are hidden by default" do
+    post games_path, params: { name: "Kim" }
+
+    [ root_path, profile_path, new_session_path ].each do |path|
+      get path
+      assert_select "a[href=?]", new_registration_path, count: 0
+    end
+    get root_path
+    assert_select "a[href=?]", new_session_path, count: 0
+    assert_select "p", I18n.t("home.show.browser_hint")
+  end
+
+  test "account links show up when accounts are visible" do
+    Rails.configuration.x.accounts_visible = true
+    post games_path, params: { name: "Kim" }
+
+    get profile_path
+    assert_select "a[href=?]", new_registration_path, minimum: 1
+    assert_select "a[href=?]", new_session_path, minimum: 1
+  ensure
+    Rails.configuration.x.accounts_visible = false
+  end
+
+  test "a guest deletes their game state" do
+    post games_path, params: { name: "Kim" }
+    guest = Profile.last
+    token = guest.guest_token
+    game = Game.last
+    open_session.post join_path, params: { code: game.code, name: "Ben" }
+
+    delete profile_path
+    assert_redirected_to root_path
+
+    assert_equal %w[ Ben ], game.reload.seats.map(&:name)
+    assert_nil Profile.guests.find_by(guest_token: token)
+    get profile_path
+    assert_select "h1", I18n.t("profiles.show.empty_title")
+  end
+
   test "round summary and final standings render" do
     post games_path, params: { name: "Anna" }
     game = Game.last

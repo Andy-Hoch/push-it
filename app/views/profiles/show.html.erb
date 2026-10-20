@@ -11,7 +11,7 @@
         <%= avatar_tag @profile.name, classes: "!size-16 !text-3xl" %>
         <div class="min-w-0 flex-1">
           <h1 class="truncate text-4xl"><%= @profile.name %></h1>
-          <p class="text-cream/75"><%= @profile.guest? ? t(".guest") : t(".account", email: @profile.user.email_address) %></p>
+          <p class="text-cream/75"><%= @profile.guest? ? t(accounts_visible? ? ".guest" : ".browser") : t(".account", email: @profile.user.email_address) %></p>
         </div>
       </div>
 
@@ -35,12 +35,19 @@
 
       <div class="paper space-y-4">
         <% if @profile.guest? %>
-          <h2 class="text-2xl text-ink"><%= t(".save_title") %></h2>
-          <p class="text-ink/70"><%= t(".save_hint") %></p>
-          <div class="flex flex-col gap-2 sm:flex-row">
-            <%= link_to t("layouts.nav.sign_up"), new_registration_path, class: "btn btn-gold flex-1" %>
-            <%= link_to t("layouts.nav.sign_in"), new_session_path, class: "btn btn-cream flex-1" %>
-          </div>
+          <% if accounts_visible? %>
+            <h2 class="text-2xl text-ink"><%= t(".save_title") %></h2>
+            <p class="text-ink/70"><%= t(".save_hint") %></p>
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <%= link_to t("layouts.nav.sign_up"), new_registration_path, class: "btn btn-gold flex-1" %>
+              <%= link_to t("layouts.nav.sign_in"), new_session_path, class: "btn btn-cream flex-1" %>
+            </div>
+          <% else %>
+            <h2 class="text-2xl text-ink"><%= t(".browser_title") %></h2>
+            <p class="text-ink/70"><%= t(".browser_hint") %></p>
+          <% end %>
+          <%= button_to t(".destroy"), profile_path, method: :delete, class: "btn-ghost w-full text-sm !text-ember hover:!bg-ember/10",
+                form: { data: { turbo_confirm: t(".destroy_confirm"), action: "turbo:submit-start->identity#forget" } } %>
         <% else %>
           <h2 class="text-2xl text-ink"><%= t(".account_title") %></h2>
           <p class="text-ink/70"><%= t(".account_hint") %></p>

@@ -29,7 +29,9 @@
         <%= form.button t(".join"), formaction: join_path, class: "btn btn-ember shrink-0" %>
       </div>
 
-      <% if current_profile.nil? || current_profile.guest? %>
+      <% if !accounts_visible? %>
+        <p class="text-sm text-ink/60"><%= t(".browser_hint") %></p>
+      <% elsif current_profile.nil? || current_profile.guest? %>
         <p class="text-sm text-ink/60"><%= t(".guest_hint_html", sign_up: link_to(t(".sign_up"), new_registration_path, class: "font-extrabold underline")) %></p>
       <% end %>
     <% end %>
