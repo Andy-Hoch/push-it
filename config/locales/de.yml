@@ -71,6 +71,7 @@ de:
       code: Einladungscode
       join: Beitreten
       sign_up: Account erstellen
+      browser_hint: Kein Account nötig – dein Profil und deine Statistik werden in diesem Browser gespeichert.
       guest_hint_html: Du spielst als Gast – dein Profil wird in diesem Browser gespeichert. %{sign_up}, um deinen Spielstand dauerhaft zu sichern.
       open_games: Deine offenen Partien
 
@@ -96,11 +97,13 @@ de:
   profiles:
     guest: Gast
     updated: Name gespeichert.
+    destroyed: Dein Spielstand wurde gelöscht.
     show:
       empty_title: Noch kein Profil
       empty: Starte oder betritt ein Spiel – dein Gastprofil entsteht dabei automatisch.
       play: Jetzt spielen
       guest: Gastprofil – gespeichert in diesem Browser
+      browser: Gespeichert in diesem Browser
       account: "Account: %{email}"
       stats:
         games_played: Spiele
@@ -113,6 +116,10 @@ de:
       save: Speichern
       save_title: Spielstand sichern
       save_hint: Dein Gastprofil lebt im Local Storage dieses Browsers. Mit einem Account werden Statistik und laufende Partien übernommen und sind überall verfügbar – auch mitten im Spiel.
+      browser_title: Dein Spielstand
+      browser_hint: Name, Statistik und laufende Partien sind in diesem Browser gespeichert. Spiel einfach im selben Browser weiter, um alles zu behalten.
+      destroy: Spielstand löschen
+      destroy_confirm: Name, Statistik und Spielverlauf werden aus diesem Browser gelöscht und du verlässt laufende Partien. Das lässt sich nicht rückgängig machen.
       account_title: Account
       account_hint: Dein Spielstand ist in deinem Account gespeichert.
       history: Letzte Partien

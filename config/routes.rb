@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   resource :session, only: %i[ new create destroy ]
   resources :passwords, only: %i[ new create edit update ], param: :token
   resource :registration, only: %i[ new create ]
-  resource :profile, only: %i[ show update ]
+  resource :profile, only: %i[ show update destroy ]
   resource :profile_restoration, only: :create
   resource :join, only: :create
 

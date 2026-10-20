@@ -24,6 +24,9 @@ module PushIt
     config.time_zone = "Berlin"
     config.i18n.default_locale = :de
     config.i18n.available_locales = %i[de en]
+
+    # Accounts stay hidden until mail delivery works; registration and sign-in remain reachable by URL.
+    config.x.accounts_visible = ENV["ACCOUNTS_VISIBLE"] == "true"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

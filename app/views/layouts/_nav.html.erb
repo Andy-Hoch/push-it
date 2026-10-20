@@ -6,13 +6,13 @@
       <%= link_to profile_path, class: "btn-ghost !gap-2 font-sans font-extrabold" do %>
         <%= avatar_tag current_profile.name, classes: "!size-8 !text-base" %>
         <span class="hidden max-w-36 truncate sm:inline"><%= current_profile.name %></span>
-        <% if current_profile.guest? %><span class="badge badge-active"><%= t(".guest") %></span><% end %>
+        <% if accounts_visible? && current_profile.guest? %><span class="badge badge-active"><%= t(".guest") %></span><% end %>
       <% end %>
     <% end %>
 
     <% if authenticated? %>
       <%= button_to t(".sign_out"), session_path, method: :delete, class: "btn-ghost text-sm" %>
-    <% else %>
+    <% elsif accounts_visible? %>
       <%= link_to t(".sign_in"), new_session_path, class: "btn-ghost text-sm" %>
       <%= link_to t(".sign_up"), new_registration_path, class: "btn-ghost hidden text-sm sm:inline-flex" %>
     <% end %>

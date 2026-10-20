@@ -12,6 +12,6 @@
   <% end %>
   <div class="mt-5 flex justify-between text-sm font-bold text-ink/70">
     <%= link_to t("sessions.new.forgot"), new_password_path, class: "underline" %>
-    <%= link_to t("sessions.new.sign_up"), new_registration_path, class: "underline" %>
+    <% if accounts_visible? %><%= link_to t("sessions.new.sign_up"), new_registration_path, class: "underline" %><% end %>
   </div>
 <% end %>

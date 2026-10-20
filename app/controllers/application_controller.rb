@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include ProfileIdentification
 
   allow_unauthenticated_access
+  helper_method :accounts_visible?
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
@@ -13,4 +14,9 @@ class ApplicationController < ActionController::Base
   rescue_from Gameplay::IllegalMove do |error|
     redirect_back_or_to root_path, alert: error.message
   end
+
+  private
+    def accounts_visible?
+      Rails.configuration.x.accounts_visible
+    end
 end

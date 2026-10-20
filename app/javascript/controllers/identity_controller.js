@@ -49,6 +49,11 @@ export default class extends Controller {
     }
   }
 
+  // Runs before the "delete game state" request, so restore() has nothing to bring back.
+  forget() {
+    try { localStorage.removeItem(STORAGE_KEY) } catch {}
+  }
+
   read() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) } catch { return null }
   }
