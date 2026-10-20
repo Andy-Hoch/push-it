@@ -23,7 +23,10 @@
     <% if table.deadline && table.pending&.dig("type") != "next_round" %>
       <div class="mt-2"><%= countdown_tag table.deadline %></div>
     <% end %>
-    <% if (last = table.log.last) %>
+    <% if table.phase == "round_over" && (ender = table.round_ender) %>
+      <p class="mt-1 max-w-md font-extrabold <%= ender["key"] == "jackpot" ? "text-gold" : "text-cream" %>"
+         data-deal-target="spoiler"><%= log_line ender %></p>
+    <% elsif (last = table.log.last) %>
       <p class="mt-1 text-sm text-cream/75" data-deal-target="spoiler"><%= log_line last %></p>
     <% end %>
   </div>

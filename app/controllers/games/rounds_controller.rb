@@ -3,7 +3,7 @@ class Games::RoundsController < ApplicationController
   before_action :set_seat
 
   def create
-    @game.play(&:start_round)
+    @game.play { |engine| engine.ready(@seat.id) }
     back_to_game
   end
 end

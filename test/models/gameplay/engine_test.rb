@@ -84,7 +84,7 @@ class Gameplay::EngineTest < ActiveSupport::TestCase
     assert_equal 5, engine.player(BEN)["total"]
     assert_equal 0, engine.player(CARLA)["total"]
     assert_equal 15, engine.player(ANNA)["total"]
-    assert_equal({ "type" => "next_round" }, engine.pending)
+    assert_equal({ "type" => "next_round", "ready" => [] }, engine.pending)
   end
 
   test "seven unique numbers end the round immediately with a 15 point bonus for everyone still in" do
@@ -310,4 +310,52 @@ class Gameplay::EngineTest < ActiveSupport::TestCase
     assert engine.over?
     assert_equal ANNA, engine.winner["id"]
   end
+
+  test "the next round starts only once everyone still at the table is ready" do
+    engine = round_over_engine
+    engine.ready(BEN)
+    engine.ready(BEN)
+    engine.ready(CARLA)
+
+    assert_equal "round_over", engine.phase
+    assert_equal [ BEN, CARLA ], engine.pending["ready"]
+
+    engine.ready(ANNA)
+    assert_equal 2, engine.round
+  end
+
+  test "players can only get ready while a round summary is up" do
+    engine = engine_with(%w[ n5 n6 n7 ])
+    assert_raises(Gameplay::IllegalMove) { engine.ready(BEN) }
+
+    engine = round_over_engine
+    engine.leave(CARLA)
+    assert_raises(Gameplay::IllegalMove) { engine.ready(CARLA) }
+  end
+
+  test "the last player everyone waits for leaving starts the next round" do
+    engine = round_over_engine
+    engine.ready(BEN)
+    engine.ready(ANNA)
+    engine.leave(CARLA)
+
+    assert_equal 2, engine.round
+    assert_equal "out", status(engine, CARLA)
+  end
+
+  test "the timeout starts the next round without waiting for everyone" do
+    engine = round_over_engine
+    engine.ready(BEN)
+    engine.timeout!
+
+    assert_equal 2, engine.round
+  end
+
+  private
+    def round_over_engine
+      engine_with(%w[ n5 n6 n7 ]).tap do |engine|
+        [ BEN, CARLA, ANNA ].each { |id| engine.stay(id) }
+        assert_equal "round_over", engine.phase
+      end
+    end
 end

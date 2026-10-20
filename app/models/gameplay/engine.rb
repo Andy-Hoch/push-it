@@ -4,7 +4,7 @@
 #
 #   { "type" => "turn",       "player" => id }                         hit or stay
 #   { "type" => "target",     "player" => id, "card" => code, "eligible" => [ids] }
-#   { "type" => "next_round" }                                         round is scored
+#   { "type" => "next_round", "ready" => [ids] }                       round is scored; who is ready to go on
 #
 # Hand entries are { "code", "uid", "flag" } where flag is nil, "bust" (the
 # duplicate that busted the player) or "held" (an action card set aside while
@@ -146,6 +146,15 @@ class Gameplay::Engine
     run
   end
 
+  # The next round starts once everyone still at the table is ready (or on timeout!).
+  def ready(id)
+    raise Gameplay::IllegalMove, :round_not_over unless pending&.dig("type") == "next_round"
+    raise Gameplay::IllegalMove, :left if player(id)["left"]
+
+    pending["ready"] = pending.fetch("ready", []) | [ id ]
+    start_round if all_ready?
+  end
+
   # Picks a sensible default for whoever is taking too long (or has left).
   def timeout!
     case pending&.dig("type")
@@ -162,6 +171,7 @@ class Gameplay::Engine
   def leave(id)
     player = player(id)
     player["left"] = true
+    return start_round if pending&.dig("type") == "next_round" && all_ready?
     return unless in_round?
 
     if awaiting?(id) && pending["type"] == "target"
@@ -335,6 +345,10 @@ class Gameplay::Engine
       end
     end
 
+    def all_ready?
+      players.reject { |player| player["left"] }.all? { |player| pending.fetch("ready", []).include?(player["id"]) }
+    end
+
     def second_chance?(player)
       player["cards"].any? { |entry| entry["code"] == "chance" && entry["flag"].nil? }
     end
@@ -401,7 +415,7 @@ class Gameplay::Engine
       else
         write_log :tie_break if best >= target
         state["phase"] = "round_over"
-        state["pending"] = { "type" => "next_round" }
+        state["pending"] = { "type" => "next_round", "ready" => [] }
       end
     end
 

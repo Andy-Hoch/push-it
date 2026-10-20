@@ -63,6 +63,32 @@ class Game::Table
     game.deadline
   end
 
+  # -- Round summary ---------------------------------------------------------
+
+  def ready?(player)
+    pending&.dig("type") == "next_round" && pending.fetch("ready", []).include?(player["id"])
+  end
+
+  def waiting_for
+    players.reject { |player| player["left"] || ready?(player) }
+  end
+
+  # The move that ended the round (the bust, jackpot, freeze or last stay).
+  def round_ender
+    log.reverse_each.find { |entry| !entry["key"].in?(%w[ round_scored tie_break ]) && entry["round"] == round }
+  end
+
+  def tie_break?
+    log.any? { |entry| entry["key"] == "tie_break" && entry["round"] == round }
+  end
+
+  # Milliseconds until the summary may cover the table, counted on the server so
+  # a wrong clock on the device cannot skip or stretch the pause.
+  def summary_delay_ms
+    at = game.summary_at
+    at ? [ ((at - Time.current) * 1000).round, 0 ].max : 0
+  end
+
   def score(player)
     engine.projected_score(player)
   end
