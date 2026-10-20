@@ -76,7 +76,7 @@ de:
       open_games: Deine offenen Partien
 
   rules:
-    title: So wird Push It gespielt
+    title: So wird Push your Luck gespielt
     goal: Wer am Ende einer Runde als Erster mindestens 200 Punkte hat, gewinnt – bei Gleichstand an der Spitze geht es weiter. Jede Runde teilt der Dealer jedem eine offene Karte aus, dann entscheidet reihum jeder, ob er noch eine Karte zieht oder stehen bleibt.
     turn_title: Ziehen oder stehen bleiben
     turn: Zieh so viele Karten wie du willst. Bleibst du stehen, sicherst du deine Punkte für diese Runde. Ohne Karte vor dir musst du ziehen.
@@ -166,7 +166,7 @@ de:
 
   passwords_mailer:
     reset:
-      subject: Passwort für Push It zurücksetzen
+      subject: Passwort für Push your Luck zurücksetzen
       link: diese Seite
       body_html: Du kannst dein Passwort über %{link} zurücksetzen. Der Link ist %{expires} gültig.
       body_text: "Du kannst dein Passwort hier zurücksetzen: %{url} – der Link ist %{expires} gültig."
