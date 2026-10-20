@@ -1,7 +1,10 @@
 module Game::Playable
   extend ActiveSupport::Concern
 
-  NEXT_ROUND_SECONDS = 20
+  # The round summary waits a moment so everyone sees the card that ended the round,
+  # then stays up for one turn (or a minute at untimed tables) unless all are ready sooner.
+  SUMMARY_DELAY = 3.seconds
+  UNTIMED_SUMMARY_SECONDS = 60
 
   def start!(by:)
     with_lock do
@@ -30,6 +33,10 @@ module Game::Playable
 
   def deadline
     Time.zone.parse(engine.pending["deadline_at"]) if engine.pending&.dig("deadline_at")
+  end
+
+  def summary_at
+    Time.zone.parse(engine.pending["summary_at"]) if engine.pending&.dig("summary_at")
   end
 
   def rematch!(by:)
@@ -65,11 +72,17 @@ module Game::Playable
       schedule_timeout
     end
 
+    # Only fresh decisions get a deadline; a ready vote keeps the summary's clock running.
     def stamp_deadline(pending)
-      return if pending.nil?
+      return if pending.nil? || pending.key?("deadline_at")
 
-      seconds = pending["type"] == "next_round" ? [ turn_seconds, NEXT_ROUND_SECONDS ].min : turn_seconds
-      pending["deadline_at"] = seconds.positive? ? seconds.seconds.from_now.iso8601 : nil
+      if pending["type"] == "next_round"
+        shown_at = SUMMARY_DELAY.from_now
+        pending["summary_at"] = shown_at.iso8601(3)
+        pending["deadline_at"] = (shown_at + (turn_seconds.positive? ? turn_seconds : UNTIMED_SUMMARY_SECONDS).seconds).iso8601
+      else
+        pending["deadline_at"] = turn_seconds.positive? ? turn_seconds.seconds.from_now.iso8601 : nil
+      end
     end
 
     def schedule_timeout

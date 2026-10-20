@@ -69,7 +69,50 @@ class GameTest < ActiveSupport::TestCase
     assert_equal @ben, @game.reload.host
   end
 
+  test "the round summary shows after a pause and stays up for one turn" do
+    @game.update!(turn_seconds: 30)
+    @game.join!(@ben)
+    @game.start!(by: @anna)
+
+    freeze_time do
+      assert_enqueued_with(job: TurnTimeoutJob) { finish_round }
+
+      assert_equal Game::SUMMARY_DELAY.from_now, @game.summary_at
+      assert_equal @game.summary_at + 30.seconds, @game.deadline
+    end
+  end
+
+  test "without a turn timer the round summary still moves on after a minute" do
+    @game.update!(turn_seconds: 0)
+    @game.join!(@ben)
+    @game.start!(by: @anna)
+
+    freeze_time do
+      assert_enqueued_with(job: TurnTimeoutJob) { finish_round }
+      assert_equal @game.summary_at + Game::UNTIMED_SUMMARY_SECONDS.seconds, @game.deadline
+    end
+  end
+
+  test "a ready vote keeps the summary's clock and the timeout still fires" do
+    @game.join!(@ben)
+    @game.start!(by: @anna)
+    finish_round
+    deadline = @game.deadline
+
+    travel 2.seconds do
+      @game.play { |engine| engine.ready(@game.seat_for(@anna).id) }
+    end
+    assert_equal deadline, @game.reload.deadline
+
+    @game.timeout!(@game.turn_seq)
+    assert_equal 2, @game.reload.engine.round
+  end
+
   private
+    def finish_round
+      @game.play { |engine| engine.timeout! until engine.pending["type"] == "next_round" }
+    end
+
     def play_out(engine)
       until engine.over?
         case engine.pending["type"]

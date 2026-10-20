@@ -11,6 +11,15 @@ module GamesHelper
     end
   end
 
+  # Only what explains a row of the round summary: why it scored nothing or extra.
+  def summary_badge(player)
+    if player["left"]
+      tag.span(t("games.status.left"), class: "badge badge-out")
+    elsif player["jackpot"] || player["status"].in?(%w[ busted frozen ])
+      status_badge(player)
+    end
+  end
+
   def seat_classes(table, player)
     [ "seat", ("is-turn" if table.turn?(player)), ("is-target" if table.choosable?(player)), "is-#{player["status"]}" ]
   end

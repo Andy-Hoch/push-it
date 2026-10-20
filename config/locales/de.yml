@@ -28,6 +28,8 @@ de:
       not_enough_players: Es braucht mindestens zwei Spieler.
       game_not_running: Das Spiel läuft gerade nicht.
       game_not_finished: Das Spiel ist noch nicht vorbei.
+      round_not_over: Gerade gibt es keine Wertung – die Runde läuft schon weiter.
+      left: Du hast den Tisch schon verlassen.
 
   log:
     round_started: "Runde %{round} – %{dealer} teilt aus."
@@ -250,13 +252,15 @@ de:
       kicker: Wertung
       title: "Runde %{round}"
       peek: Tisch ansehen
+      rank: Platz
       player: Spieler
-      numbers: Zahlen
-      modifiers: Bonus
       round_points: Runde
       total: Gesamt
-      next_round: Nächste Runde
-      auto_start: Startet automatisch in
+      ready: bereit
+      next_round: Weiter
+      you_are_ready: Du bist bereit.
+      waiting_for: "Warte auf %{players}"
+      auto_start: Nächste Runde startet spätestens in
     game_over:
       kicker: Spiel vorbei
       winner: "%{player} gewinnt!"
