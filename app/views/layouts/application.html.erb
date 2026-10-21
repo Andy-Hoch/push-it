@@ -10,9 +10,8 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;800;900&display=swap">
+    <%= preload_link_tag "nunito-latin.woff2", as: "font", type: "font/woff2", crossorigin: "anonymous" %>
+    <%= preload_link_tag "lilita-one-latin.woff2", as: "font", type: "font/woff2", crossorigin: "anonymous" %>
 
     <%= yield :head %>
 
