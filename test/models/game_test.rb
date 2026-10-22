@@ -62,6 +62,20 @@ class GameTest < ActiveSupport::TestCase
     assert_equal rematch, @game.reload.rematch!(by: @anna)
   end
 
+  test "only the host changes the settings, and only in the lobby" do
+    @game.join!(@ben)
+
+    error = assert_raises(Gameplay::IllegalMove) { @game.configure(by: @ben, turn_seconds: 20) }
+    assert_equal :not_host, error.reason
+
+    @game.configure(by: @anna, turn_seconds: 20, target_score: 100)
+    assert_equal [ 20, 100 ], @game.reload.values_at(:turn_seconds, :target_score)
+
+    @game.start!(by: @anna)
+    error = assert_raises(Gameplay::IllegalMove) { @game.configure(by: @anna, turn_seconds: 30) }
+    assert_equal :already_started, error.reason
+  end
+
   test "leaving the lobby hands the table to the next player" do
     @game.join!(@ben)
     @game.leave!(@game.seat_for(@anna))

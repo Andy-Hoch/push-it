@@ -1,6 +1,27 @@
 require "test_helper"
 
 class ProfileTest < ActiveSupport::TestCase
+  test "guest names are trimmed strings, otherwise a generated name" do
+    assert_equal "Anna Lena", Profile.guest_name_for("  Anna   Lena ")
+    assert_equal 24, Profile.guest_name_for("x" * 30).length
+    assert_match(/\AGast \d{3}\z/, Profile.guest_name_for({ "x" => 1 }))
+    assert_match(/\AGast \d{3}\z/, Profile.guest_name_for(" "))
+  end
+
+  test "forgetting a guest leaves open tables, keeps finished ones and regenerates the token" do
+    guest = Profile.create!(name: "Kim")
+    friend = Profile.create!(name: "Ben")
+    open_game = Game.open_for!(guest).tap { |game| game.join!(friend) }
+    finished_game = Game.open_for!(guest).tap { |game| game.update!(status: :finished) }
+    token = guest.guest_token
+
+    guest.forget!
+
+    assert_equal %w[ Ben ], open_game.reload.seats.map(&:name)
+    assert_equal %w[ Kim ], finished_game.reload.seats.map(&:name)
+    assert_not_equal token, guest.reload.guest_token
+  end
+
   test "claiming a guest links it to a user without a profile" do
     guest = Profile.create!(name: "Kim", games_won: 2)
 

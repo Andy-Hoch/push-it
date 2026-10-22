@@ -28,5 +28,9 @@ module PushIt
     # Accounts stay hidden until mail delivery works; registration and sign-in remain reachable by URL.
     config.x.accounts_visible = ENV["ACCOUNTS_VISIBLE"] == "true"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Native apps open the cable without an Origin header. Browsers always send one, so
+    # they still have to come from the same host; apps then identify by guest token.
+    config.action_cable.allowed_request_origins = [ ->(origin) { origin.nil? } ]
   end
 end

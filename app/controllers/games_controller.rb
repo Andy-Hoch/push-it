@@ -1,7 +1,6 @@
 class GamesController < ApplicationController
   include GameScoped
   skip_before_action :set_game, only: :create
-  before_action :require_host, only: :update
 
   def create
     game = Game.open_for!(ensure_profile(params[:name]))
@@ -13,7 +12,7 @@ class GamesController < ApplicationController
   end
 
   def update
-    @game.update!(game_params) if @game.lobby?
+    @game.configure(by: current_profile, **game_params)
     back_to_game
   end
 

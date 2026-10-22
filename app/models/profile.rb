@@ -20,10 +20,18 @@ class Profile < ApplicationRecord
     "#{I18n.t("profiles.guest")} #{SecureRandom.random_number(100..999)}"
   end
 
+  def self.create_guest!(name = nil)
+    create!(name: guest_name_for(name))
+  end
+
+  def self.guest_name_for(name)
+    (name if name.is_a?(String)).to_s.squish.first(24).presence || guest_name
+  end
+
   # Rebuilds a guest from the snapshot a browser kept in localStorage.
   def self.restore(token:, snapshot: {})
     guests.find_by(guest_token: token.to_s) || create!(
-      name: snapshot["name"].to_s.squish.first(24).presence || guest_name,
+      name: guest_name_for(snapshot["name"]),
       **STATS.to_h { |stat| [ stat, snapshot.dig("stats", stat).to_i.clamp(0, 1_000_000) ] }
     )
   end
@@ -52,6 +60,15 @@ class Profile < ApplicationRecord
 
   def win_rate
     games_played.zero? ? 0 : (100.0 * games_won / games_played).round
+  end
+
+  # Forgets a guest on this device: leaves open tables and invalidates the token. The
+  # record stays so finished games of other players keep their seats, winner and host.
+  def forget!
+    transaction do
+      open_games.each { |game| game.leave!(game.seat_for(self)) }
+      regenerate_guest_token
+    end
   end
 
   def snapshot

@@ -48,6 +48,21 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
     idle.assert_select "[role=alert]", I18n.t("gameplay.errors.not_your_turn")
   end
 
+  test "only the host changes the table settings" do
+    post games_path, params: { name: "Anna" }
+    game = Game.last
+    friend = open_session
+    friend.post join_path, params: { code: game.code, name: "Ben" }
+
+    friend.patch game_path(game), params: { game: { turn_seconds: 20 } }, headers: { "Referer" => game_url(game) }
+    friend.follow_redirect!
+    friend.assert_select "[role=alert]", I18n.t("gameplay.errors.not_host")
+
+    patch game_path(game), params: { game: { turn_seconds: 20, target_score: 100 } }
+    assert_redirected_to game_path(game)
+    assert_equal [ 20, 100 ], game.reload.values_at(:turn_seconds, :target_score)
+  end
+
   test "an unknown code sends you back home" do
     post join_path, params: { code: "ZZZZZZ" }
     assert_redirected_to root_path
