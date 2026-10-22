@@ -35,7 +35,7 @@ module ProfileIdentification
     end
 
     def create_guest_profile(name)
-      Profile.create!(name: name || Profile.guest_name).tap { |profile| remember_guest(profile) }
+      Profile.create_guest!(name).tap { |profile| remember_guest(profile) }
     end
 
     def remember_guest(profile)

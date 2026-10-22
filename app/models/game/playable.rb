@@ -20,6 +20,15 @@ module Game::Playable
     end
   end
 
+  def configure(by:, **settings)
+    with_lock do
+      raise Gameplay::IllegalMove, :not_host unless host?(by)
+      raise Gameplay::IllegalMove, :already_started unless lobby?
+
+      update!(settings)
+    end
+  end
+
   # Runs one engine command under a row lock and persists the result.
   def play(&)
     with_lock { play_locked(&) }

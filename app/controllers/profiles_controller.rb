@@ -9,12 +9,10 @@ class ProfilesController < ApplicationController
     redirect_to profile_path, notice: t("profiles.updated")
   end
 
-  # Forgets the guest in this browser: leaves open tables and invalidates the token. The
-  # record stays so finished games of other players keep their seats, winner and host.
+  # Forgets the guest in this browser (see Profile#forget!).
   def destroy
     if (guest = current_profile)&.guest?
-      guest.open_games.each { |game| game.leave!(game.seat_for(guest)) }
-      guest.regenerate_guest_token
+      guest.forget!
       cookies.delete(:profile_token)
     end
 

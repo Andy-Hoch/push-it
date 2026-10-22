@@ -9,6 +9,9 @@ de:
         password_confirmation: Passwort-Bestätigung
       profile:
         name: Name
+      game:
+        turn_seconds: Zeit pro Zug
+        target_score: Ziel
 
   gameplay:
     cards:
@@ -269,3 +272,8 @@ de:
       rematch: Revanche!
       to_rematch: Zur Revanche
       home: Zur Startseite
+
+  api:
+    errors:
+      unauthorized: Unbekanntes oder fehlendes Gast-Token.
+      not_found: Nicht gefunden.

@@ -20,5 +20,24 @@ Rails.application.routes.draw do
     end
   end
 
+  # The native apps play as guests with their profile's guest token as bearer token.
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      resource :profile, only: %i[ show create update destroy ]
+
+      resources :games, only: %i[ create show update ], param: :code do
+        scope module: :games do
+          resource :seat, only: %i[ create destroy ]
+          resource :start, only: :create
+          resources :rounds, only: :create
+          resource :hit, only: :create
+          resource :stay, only: :create
+          resource :choice, only: :create
+          resource :rematch, only: :create
+        end
+      end
+    end
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

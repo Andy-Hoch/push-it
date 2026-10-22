@@ -16,6 +16,7 @@ class Game < ApplicationRecord
   enum :status, %w[ lobby playing finished ].index_by(&:itself), default: :lobby
 
   broadcasts_refreshes
+  after_commit :signal_apps, on: %i[ update destroy ]
 
   before_validation :assign_code, on: :create
   validates :code, presence: true, uniqueness: true
@@ -50,6 +51,11 @@ class Game < ApplicationRecord
   end
 
   private
+    # Native apps only hear that the table changed and fetch their own view over the API.
+    def signal_apps
+      GameChannel.broadcast_to(self, code: code, turn_seq: turn_seq, status: destroyed? ? "closed" : status, updated_at: updated_at.iso8601(6))
+    end
+
     def assign_code
       self.code ||= loop do
         candidate = Array.new(CODE_LENGTH) { CODE_ALPHABET.sample(random: SecureRandom) }.join
