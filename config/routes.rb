@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   root "home#show"
 
+  get "manifest" => "pwa#manifest", as: :pwa_manifest
+
   resource :session, only: %i[ new create destroy ]
   resources :passwords, only: %i[ new create edit update ], param: :token
   resource :registration, only: %i[ new create ]
