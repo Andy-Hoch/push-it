@@ -31,6 +31,30 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
     assert_select "#seat-#{game.seat_for(Profile.find_by(name: "Anna")).id}"
   end
 
+  test "the host adds and removes computer players in the lobby" do
+    post games_path, params: { name: "Anna" }
+    game = Game.last
+
+    post game_bots_path(game), params: { level: "expert" }
+    assert_redirected_to game_path(game)
+    follow_redirect!
+    bot = game.reload.seats.find(&:bot?)
+    assert_select "##{ActionView::RecordIdentifier.dom_id(bot)}", text: /#{I18n.t("games.lobby.bot_levels.expert")}/
+    assert_select "button", text: I18n.t("games.lobby.start")
+
+    friend = open_session
+    friend.post join_path, params: { code: game.code, name: "Ben" }
+    friend.post game_bots_path(game), params: { level: "easy" }, headers: { "Referer" => game_url(game) }
+    assert_equal 1, game.reload.seats.count(&:bot?)
+
+    get game_path(game) # a bot goes without asking, a person only after a confirmation
+    assert_select "form:not([data-turbo-confirm]) button[aria-label=?]", I18n.t("games.lobby.remove", name: bot.name)
+    assert_select "form[data-turbo-confirm] button[aria-label=?]", I18n.t("games.lobby.remove", name: "Ben")
+
+    delete game_seat_path(game), params: { seat_id: bot.id }
+    assert_not game.reload.seats.any?(&:bot?)
+  end
+
   test "moves out of turn are rejected with a message" do
     post games_path, params: { name: "Anna" }
     game = Game.last

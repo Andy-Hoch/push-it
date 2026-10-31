@@ -168,6 +168,11 @@ class Gameplay::Engine
     end
   end
 
+  # Ends the game on the spot, e.g. when only computer players are left at the table.
+  def abandon
+    finish_game(players.max_by { |player| player["total"] }) unless over?
+  end
+
   def leave(id)
     player = player(id)
     player["left"] = true

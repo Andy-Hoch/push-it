@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   resources :games, only: %i[ create show update ], param: :code do
     scope module: :games do
       resource :seat, only: %i[ create destroy ]
+      resources :bots, only: :create
       resource :start, only: :create
       resources :rounds, only: :create
       resource :hit, only: :create
@@ -30,6 +31,7 @@ Rails.application.routes.draw do
       resources :games, only: %i[ create show update ], param: :code do
         scope module: :games do
           resource :seat, only: %i[ create destroy ]
+          resources :bots, only: :create
           resource :start, only: :create
           resources :rounds, only: :create
           resource :hit, only: :create

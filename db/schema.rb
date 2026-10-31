@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_071958) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_31_120000) do
   create_table "games", force: :cascade do |t|
     t.string "code", null: false
     t.string "status", default: "lobby", null: false
@@ -40,6 +40,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_071958) do
     t.integer "total_points", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "bot_level"
     t.index ["guest_token"], name: "index_profiles_on_guest_token", unique: true
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end

@@ -1,5 +1,6 @@
 # A player identity. Guests are profiles without a user; their guest token lives in a
 # signed cookie and is mirrored to localStorage so the browser can find its way back.
+# Computer players are profiles with a bot level, created for the table they sit at.
 class Profile < ApplicationRecord
   include Claimable
 
@@ -15,6 +16,7 @@ class Profile < ApplicationRecord
 
   normalizes :name, with: ->(name) { name.squish }
   validates :name, presence: true, length: { maximum: 24 }
+  validates :bot_level, inclusion: { in: Gameplay::Bot::LEVELS }, allow_nil: true
 
   def self.guest_name
     "#{I18n.t("profiles.guest")} #{SecureRandom.random_number(100..999)}"
@@ -22,6 +24,12 @@ class Profile < ApplicationRecord
 
   def self.create_guest!(name = nil)
     create!(name: guest_name_for(name))
+  end
+
+  # Bots get a human first name that nobody at the table has yet, marked with 🤖.
+  def self.create_bot!(level:, taken: [])
+    names = I18n.t("profiles.bot_names").map { |name| "#{name} 🤖" } - taken
+    create!(name: names.sample || "Bot #{taken.size + 1} 🤖", bot_level: level)
   end
 
   def self.guest_name_for(name)
@@ -40,6 +48,15 @@ class Profile < ApplicationRecord
     user_id.nil?
   end
 
+  def bot?
+    bot_level.present?
+  end
+
+  # Bots belong to one table, so a rematch seats a fresh one of the same name and level.
+  def rematch_profile
+    bot? ? Profile.create!(name: name, bot_level: bot_level) : self
+  end
+
   def open_games
     games.where(status: %w[ lobby playing ], seats: { left_at: nil }).order(updated_at: :desc)
   end
@@ -49,6 +66,8 @@ class Profile < ApplicationRecord
   end
 
   def record_game!(won:, jackpots:, best_round:, points:)
+    return if bot?
+
     update!(
       games_played: games_played + 1,
       games_won: games_won + (won ? 1 : 0),

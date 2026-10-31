@@ -5,6 +5,9 @@ module Game::Playable
   # then stays up for one turn (or a minute at untimed tables) unless all are ready sooner.
   SUMMARY_DELAY = 3.seconds
   UNTIMED_SUMMARY_SECONDS = 60
+  BOT_MIN_THINKING = 0.5
+  BOT_TIMER_MARGIN = 3
+  BOT_READY_DELAY = 1.0..4.0
 
   def start!(by:)
     with_lock do
@@ -40,6 +43,29 @@ module Game::Playable
     end
   end
 
+  # A bot's move, unless someone moved in the meantime.
+  def bot_move!(seq)
+    with_lock do
+      next unless playing? && turn_seq == seq && (seat = pending_bot_seat)
+
+      play_locked do |engine|
+        action, *args = Gameplay::Bot.for(engine, seat.id, level: seat.bot_level).decision
+        engine.public_send(action, seat.id, *args)
+      end
+    end
+  end
+
+  # A bot clicking "ready" on the summary of the given round.
+  def bot_ready!(seat, round)
+    with_lock do
+      pending = engine.pending
+      next unless playing? && seat.bot? && !seat.left? && pending&.dig("type") == "next_round" && engine.round == round
+      next if pending.fetch("ready", []).include?(seat.id)
+
+      play_locked { |engine| engine.ready(seat.id) }
+    end
+  end
+
   def deadline
     Time.zone.parse(engine.pending["deadline_at"]) if engine.pending&.dig("deadline_at")
   end
@@ -54,7 +80,7 @@ module Game::Playable
 
       Game.find_by(code: rematch_code) || Game.transaction do
         Game.create!(host: by, turn_seconds: turn_seconds, target_score: target_score).tap do |game|
-          present_seats.rotate(1).each_with_index { |seat, index| game.seats.create!(profile: seat.profile, position: index) }
+          present_seats.rotate(1).each_with_index { |seat, index| game.seats.create!(profile: seat.profile.rematch_profile, position: index) }
           update!(rematch_code: game.code)
         end
       end
@@ -71,6 +97,7 @@ module Game::Playable
     end
 
     def commit(engine)
+      fresh = engine.pending.present? && !engine.pending.key?("deadline_at")
       stamp_deadline(engine.state["pending"])
       self.state = engine.state
       self.turn_seq += 1
@@ -79,6 +106,7 @@ module Game::Playable
       save!
       @engine = nil
       schedule_timeout
+      schedule_bots(fresh)
     end
 
     # Only fresh decisions get a deadline; a ready vote keeps the summary's clock running.
@@ -98,6 +126,24 @@ module Game::Playable
       if (at = deadline)
         TurnTimeoutJob.set(wait_until: at).perform_later(self, turn_seq)
       end
+    end
+
+    # Bots take a human moment to think, but always move before the turn timer runs out.
+    def schedule_bots(fresh)
+      if (seat = pending_bot_seat)
+        thinking = Gameplay::Bot.for(engine, seat.id, level: seat.bot_level).thinking_time
+        thinking = thinking.clamp(BOT_MIN_THINKING, [ turn_seconds - BOT_TIMER_MARGIN, BOT_MIN_THINKING ].max) if turn_seconds.positive?
+        BotTurnJob.set(wait: thinking.seconds).perform_later(self, turn_seq)
+      elsif fresh && engine.pending&.dig("type") == "next_round"
+        present_seats.select(&:bot?).each do |bot|
+          BotReadyJob.set(wait_until: summary_at + rand(BOT_READY_DELAY).seconds).perform_later(self, bot, engine.round)
+        end
+      end
+    end
+
+    def pending_bot_seat
+      seat = present_seats.find { |candidate| candidate.id == engine.pending&.dig("player") }
+      seat if seat&.bot? && engine.pending["type"].in?(%w[ turn target ])
     end
 
     def sync_scores(engine)

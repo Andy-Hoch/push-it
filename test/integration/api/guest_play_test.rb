@@ -54,6 +54,23 @@ class Api::GuestPlayTest < ActionDispatch::IntegrationTest
     assert me["cards"].all? { |card| card.key?("kind") && card.key?("uid") }
   end
 
+  test "the host seats a computer player" do
+    post api_v1_games_path, headers: auth(@anna), as: :json
+    code = response.parsed_body["code"]
+    assert_equal Gameplay::Bot::LEVELS, response.parsed_body.dig("options", "bot_levels")
+
+    post api_v1_game_bots_path(code), params: { level: "hard" }, headers: auth(@anna), as: :json
+    assert_response :created
+    bot = response.parsed_body["seats"].last
+    assert_equal [ true, "hard" ], bot.values_at("bot", "bot_level")
+
+    post api_v1_game_bots_path(code), params: { level: "hard" }, headers: auth(@ben), as: :json
+    assert_equal "not_host", response.parsed_body["error"]
+
+    post api_v1_game_start_path(code), headers: auth(@anna), as: :json
+    assert_equal [ false, true ], response.parsed_body.dig("table", "players").pluck("bot")
+  end
+
   test "the deck order never leaves the server" do
     game = started_game
 

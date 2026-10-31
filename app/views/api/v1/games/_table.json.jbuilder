@@ -30,6 +30,7 @@ end
 json.players table.players do |player|
   json.id player["id"]
   json.name table.name_for(player)
+  json.bot table.seat_for(player)&.bot? || false
   json.merge! player.slice("total", "status", "left", "jackpot", "jackpots", "best", "round_score")
   json.score table.score(player)
   json.progress table.progress(player)

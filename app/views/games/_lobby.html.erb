@@ -30,10 +30,11 @@
           <div class="min-w-0 flex-1">
             <p class="truncate font-extrabold"><%= player_seat.name %><%= " (#{t(".you")})" if player_seat == seat %></p>
             <% if game.host_id == player_seat.profile_id %><p class="text-xs font-extrabold text-gold uppercase">♛ <%= t(".host") %></p><% end %>
+            <% if player_seat.bot? %><p class="text-xs font-extrabold text-cream/60 uppercase"><%= t(".bot", level: t(".bot_levels.#{player_seat.bot_level}")) %></p><% end %>
           </div>
           <% if game.host?(current_profile) && player_seat != seat %>
             <%= button_to "✕", game_seat_path(game), method: :delete, params: { seat_id: player_seat.id }, class: "btn-ghost !px-2 !py-1",
-                  aria: { label: t(".remove", name: player_seat.name) }, form: { data: { turbo_confirm: t(".remove_confirm", name: player_seat.name) } } %>
+                  aria: { label: t(".remove", name: player_seat.name) }, form: { data: { turbo_confirm: (t(".remove_confirm", name: player_seat.name) unless player_seat.bot?) } } %>
           <% end %>
         </li>
       <% end %>
@@ -57,6 +58,15 @@
           <%= form.label :target_score, t(".target_score"), class: "label !text-cream/60" %>
           <%= form.select :target_score, Game::TARGET_SCORES.map { |score| [ t(".points", count: score), score ] }, {}, class: "field", data: { action: "autosubmit#submit" } %>
         </div>
+      <% end %>
+      <% if game.present_seats.size < Game::Seating::MAX_PLAYERS %>
+        <%= form_with url: game_bots_path(game), class: "flex flex-col gap-3 sm:flex-row sm:items-end" do |form| %>
+          <div class="flex-1">
+            <%= form.label :level, t(".bot_level"), class: "label !text-cream/60" %>
+            <%= form.select :level, Gameplay::Bot::LEVELS.map { |level| [ t(".bot_levels.#{level}"), level ] }, { selected: "medium" }, class: "field" %>
+          </div>
+          <%= form.button t(".add_bot"), class: "btn btn-cream" %>
+        <% end %>
       <% end %>
       <%= button_to t(".start"), game_start_path(game), class: "btn btn-gold w-full text-2xl", disabled: game.present_seats.size < 2 %>
       <% if game.present_seats.size < 2 %><p class="text-center text-sm text-cream/70"><%= t(".need_players") %></p><% end %>

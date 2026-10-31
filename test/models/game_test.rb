@@ -122,6 +122,113 @@ class GameTest < ActiveSupport::TestCase
     assert_equal 2, @game.reload.engine.round
   end
 
+  test "only the host seats bots, in the lobby, with a level and a name of their own" do
+    error = assert_raises(Gameplay::IllegalMove) { @game.add_bot!(level: "easy", by: @ben) }
+    assert_equal :not_host, error.reason
+    error = assert_raises(Gameplay::IllegalMove) { @game.add_bot!(level: "godlike", by: @anna) }
+    assert_equal :invalid_bot_level, error.reason
+
+    bots = Gameplay::Bot::LEVELS.map { |level| @game.add_bot!(level: level, by: @anna) }
+    assert_equal Gameplay::Bot::LEVELS, bots.map(&:bot_level)
+    assert bots.all? { |bot| bot.name.end_with?("🤖") }
+    assert_equal bots.size, bots.map(&:name).uniq.size
+
+    @game.start!(by: @anna)
+    error = assert_raises(Gameplay::IllegalMove) { @game.add_bot!(level: "easy", by: @anna) }
+    assert_equal :already_started, error.reason
+  end
+
+  test "bots never host: a table left to bots closes and takes them along" do
+    bot = @game.add_bot!(level: "medium", by: @anna).profile
+
+    @game.leave!(@game.seat_for(@anna))
+
+    assert_not Game.exists?(@game.id)
+    assert_not Profile.exists?(bot.id)
+  end
+
+  test "removing a bot from the lobby removes its profile" do
+    seat = @game.add_bot!(level: "easy", by: @anna)
+
+    @game.leave!(seat)
+
+    assert_not Profile.exists?(seat.profile_id)
+    assert_equal [ @anna ], @game.reload.profiles
+  end
+
+  test "a bot plays its turns until it is a person's turn again" do
+    @game.add_bot!(level: "hard", by: @anna)
+
+    perform_enqueued_jobs(only: BotTurnJob) { @game.start!(by: @anna) }
+
+    @game.reload
+    assert @game.finished? || @game.engine.pending["type"] == "next_round" || @game.engine.pending["player"] == @game.seat_for(@anna).id
+  end
+
+  test "a bot's move is skipped when someone moved in the meantime" do
+    bot = @game.add_bot!(level: "medium", by: @anna)
+    @game.start!(by: @anna)
+    @game.play { |engine| engine.timeout! until engine.pending["player"] == bot.id }
+    seq = @game.turn_seq
+
+    @game.bot_move!(seq - 1)
+    assert_equal seq, @game.reload.turn_seq
+
+    @game.bot_move!(seq)
+    assert_operator @game.reload.turn_seq, :>, seq
+  end
+
+  test "bots take a human moment and always beat the turn timer" do
+    @game.update!(turn_seconds: 20)
+    bot = @game.add_bot!(level: "expert", by: @anna)
+    @game.start!(by: @anna)
+
+    freeze_time do
+      @game.play { |engine| engine.timeout! until engine.pending["player"] == bot.id && engine.pending["type"] == "turn" } unless @game.engine.pending["player"] == bot.id
+      job = enqueued_jobs.reverse.find { |enqueued| enqueued[:job] == BotTurnJob }
+
+      assert_operator Time.zone.at(job[:at]), :>, Time.current
+      assert_operator Time.zone.at(job[:at]), :<=, @game.deadline - Game::BOT_TIMER_MARGIN.seconds
+    end
+  end
+
+  test "bots get ready for the next round after looking at the summary" do
+    bot = @game.add_bot!(level: "easy", by: @anna)
+    @game.start!(by: @anna)
+
+    assert_enqueued_with(job: BotReadyJob) { finish_round }
+
+    @game.bot_ready!(bot, @game.engine.round - 1)
+    assert_not_includes @game.reload.engine.pending["ready"], bot.id
+
+    @game.bot_ready!(bot, @game.engine.round)
+    assert_includes @game.reload.engine.pending["ready"], bot.id
+  end
+
+  test "when only bots are left the game ends and bots keep no stats" do
+    bot = @game.add_bot!(level: "medium", by: @anna)
+    @game.add_bot!(level: "easy", by: @anna)
+    @game.start!(by: @anna)
+
+    @game.leave!(@game.seat_for(@anna))
+
+    assert @game.reload.finished?
+    assert_equal 1, @anna.reload.games_played
+    assert_equal 0, bot.profile.reload.games_played
+  end
+
+  test "a rematch seats fresh bots of the same level" do
+    bot = @game.add_bot!(level: "hard", by: @anna)
+    @game.start!(by: @anna)
+    @game.play { |engine| play_out(engine) }
+
+    rematch = @game.rematch!(by: @anna)
+    seat = rematch.seats.find(&:bot?)
+
+    assert_equal [ bot.name, "hard" ], [ seat.name, seat.bot_level ]
+    assert_not_equal bot.profile_id, seat.profile_id
+  end
+
   private
     def finish_round
       @game.play { |engine| engine.timeout! until engine.pending["type"] == "next_round" }

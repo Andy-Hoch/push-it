@@ -33,6 +33,7 @@ de:
       game_not_finished: Das Spiel ist noch nicht vorbei.
       round_not_over: Gerade gibt es keine Wertung – die Runde läuft schon weiter.
       left: Du hast den Tisch schon verlassen.
+      invalid_bot_level: Diese Schwierigkeitsstufe gibt es nicht.
 
   log:
     round_started: "Runde %{round} – %{dealer} teilt aus."
@@ -101,6 +102,7 @@ de:
 
   profiles:
     guest: Gast
+    bot_names: [Lena, Jonas, Mia, Paul, Emma, Felix, Hanna, Lukas, Sophie, Max, Clara, Noah, Ida, Theo, Greta, Emil, Lotta, Jakob, Marie, Anton]
     updated: Name gespeichert.
     destroyed: Dein Spielstand wurde gelöscht.
     show:
@@ -223,6 +225,14 @@ de:
         triple: Der Spieler muss drei Karten nacheinander aufdecken.
         chance: Du hast schon eine – gib sie einem Spieler ohne Second Chance.
     lobby:
+      add_bot: Computer hinzufügen
+      bot_level: Computer-Gegner
+      bot: "🤖 Computer · %{level}"
+      bot_levels:
+        easy: Leicht
+        medium: Mittel
+        hard: Schwer
+        expert: Profi
       invite_code: Einladungscode
       copy_link: Link kopieren
       share: Teilen
