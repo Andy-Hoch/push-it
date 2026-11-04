@@ -1,0 +1,136 @@
+<% content_for :title, "Push your Luck · #{t(".title")}" %>
+<% content_for :head, tag.meta(name: "robots", content: "noindex, nofollow") %>
+
+<main class="mx-auto max-w-5xl space-y-8 px-4 pb-20">
+  <% cache [ "statistics", I18n.locale ], expires_in: 5.minutes do %>
+    <% stats = @statistics %>
+    <% kind_name = ->(kind) { kind ? t("games.lobby.bot_levels.#{kind}") : t(".person") } %>
+
+    <section class="felt">
+      <h1 class="text-4xl"><%= t(".title") %></h1>
+      <p class="text-cream/75"><%= t(".subtitle") %></p>
+
+      <h2 class="sr-only"><%= t(".games.title") %></h2>
+      <dl class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <% stats.games.each do |key, value| %>
+          <%= render "tile", label: t(".games.#{key}"), value: number_with_delimiter(value) %>
+        <% end %>
+      </dl>
+      <p class="mt-4 text-sm text-cream/60"><%= t(".games.hint") %></p>
+    </section>
+
+    <section class="panel space-y-6">
+      <h2 class="text-2xl"><%= t(".players.title") %></h2>
+      <dl class="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <% stats.players.each do |key, value| %>
+          <%= render "tile", label: t(".players.#{key}"), value: key == :average ? number_with_precision(value, precision: 1) : number_with_delimiter(value) %>
+        <% end %>
+      </dl>
+      <%= render "bars", title: t(".players.table_sizes"),
+            rows: stats.table_sizes.map { |size, count| [ t(".players.table_size", count: size), count ] } %>
+    </section>
+
+    <section class="panel space-y-4">
+      <h2 class="text-2xl"><%= t(".bots.title") %></h2>
+      <dl class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <% stats.bots.each do |level, (created, seated)| %>
+          <%= render "tile", label: "#{kind_name.(level)} · #{t(".bots.created")}", value: number_with_delimiter(created),
+                note: t(".bots.seated", count: number_with_delimiter(seated)) %>
+        <% end %>
+      </dl>
+    </section>
+
+    <section class="panel space-y-4">
+      <h2 class="text-2xl"><%= t(".win_rates.title") %></h2>
+      <ul class="space-y-3">
+        <% stats.win_rates.each do |rate| %>
+          <li class="grid grid-cols-[5.5rem_1fr_3.5rem] items-center gap-3">
+            <span class="truncate font-extrabold"><%= kind_name.(rate.kind) %></span>
+            <span class="min-w-0">
+              <span class="progress block"><span style="width: <%= rate.rate %>%"></span></span>
+              <span class="mt-1 block text-xs text-cream/60">
+                <%= t(".win_rates.games", wins: number_with_delimiter(rate.wins), count: rate.games) %> ·
+                <%= t(".win_rates.share", share: rate.share) %>
+              </span>
+            </span>
+            <span class="text-right font-display text-2xl text-gold tabular-nums"><%= rate.rate %>&nbsp;%</span>
+          </li>
+        <% end %>
+      </ul>
+      <p class="text-sm text-cream/60"><%= t(".win_rates.hint") %></p>
+    </section>
+
+    <section class="grid gap-8 md:grid-cols-2">
+      <div class="panel space-y-4">
+        <h2 class="text-2xl"><%= t(".records.title") %></h2>
+        <dl class="grid grid-cols-2 gap-3">
+          <% %i[ best_round best_round_by_person best_round_by_bot best_total ].each do |key| %>
+            <%= render "record", label: t(".records.#{key}"), record: stats.public_send(key) %>
+          <% end %>
+        </dl>
+      </div>
+
+      <div class="panel space-y-4">
+        <h2 class="text-2xl"><%= t(".gameplay.title") %></h2>
+        <dl class="grid grid-cols-2 gap-3">
+          <%= render "tile", label: t(".gameplay.rounds"), value: number_with_precision(stats.gameplay[:rounds], precision: 1) %>
+          <%= render "tile", label: t(".gameplay.zero_rate"), value: "#{stats.gameplay[:zero_rate]} %", note: t(".gameplay.zero_hint") %>
+          <%= render "tile", label: t(".gameplay.jackpots"), value: number_with_delimiter(stats.gameplay[:jackpots]) %>
+          <%= render "tile", label: t(".gameplay.minutes"), value: t(".gameplay.minutes_value", count: stats.gameplay[:minutes]) %>
+        </dl>
+      </div>
+    </section>
+
+    <section class="panel space-y-6">
+      <h2 class="text-2xl"><%= t(".settings.title") %></h2>
+      <div class="grid gap-6 md:grid-cols-2">
+        <%= render "bars", title: t(".settings.target_scores"), rows: stats.target_scores.to_a %>
+        <%= render "bars", title: t(".settings.turn_timers"),
+              rows: stats.turn_timers.map { |seconds, count| [ seconds.zero? ? t(".settings.untimed") : t(".settings.seconds", count: seconds), count ] } %>
+      </div>
+      <dl class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <%= render "tile", label: t(".settings.rematch_rate"), value: "#{stats.rematch_rate} %" %>
+      </dl>
+    </section>
+
+    <section class="panel space-y-4">
+      <h2 class="text-2xl"><%= t(".leaderboard.title") %></h2>
+      <div class="grid gap-6 md:grid-cols-2">
+        <div>
+          <h3 class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= t(".leaderboard.most_wins") %></h3>
+          <% if stats.most_wins.empty? %>
+            <p class="mt-3 text-cream/70"><%= t(".leaderboard.empty") %></p>
+          <% else %>
+            <ol class="mt-2 divide-y divide-white/10">
+              <% stats.most_wins.each.with_index(1) do |leader, place| %>
+                <li class="flex items-center gap-3 py-2">
+                  <span class="w-6 font-display text-lg text-gold"><%= place %></span>
+                  <span class="min-w-0 flex-1 truncate font-extrabold"><%= leader.name %></span>
+                  <span class="text-sm text-cream/70"><%= t(".leaderboard.wins", count: leader.wins, rate: leader.rate) %></span>
+                </li>
+              <% end %>
+            </ol>
+          <% end %>
+        </div>
+        <div>
+          <h3 class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= t(".leaderboard.best_rounds") %></h3>
+          <% if stats.best_rounds.empty? %>
+            <p class="mt-3 text-cream/70"><%= t(".leaderboard.empty") %></p>
+          <% else %>
+            <ol class="mt-2 divide-y divide-white/10">
+              <% stats.best_rounds.each.with_index(1) do |record, place| %>
+                <li class="flex items-center gap-3 py-2">
+                  <span class="w-6 font-display text-lg text-gold"><%= place %></span>
+                  <span class="min-w-0 flex-1 truncate font-extrabold"><%= record.name %></span>
+                  <span class="font-display text-lg"><%= record.points %></span>
+                </li>
+              <% end %>
+            </ol>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <p class="text-center text-sm text-cream/50"><%= t(".updated", time: l(Time.current, format: :short)) %></p>
+  <% end %>
+</main>

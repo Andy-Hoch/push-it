@@ -10,6 +10,9 @@ Rails.application.routes.draw do
   resource :profile_restoration, only: :create
   resource :join, only: :create
 
+  # Public but deliberately linked from nowhere.
+  resource :statistics, only: :show, path: "statistik"
+
   resources :games, only: %i[ create show update ], param: :code do
     scope module: :games do
       resource :seat, only: %i[ create destroy ]

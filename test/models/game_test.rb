@@ -2,6 +2,7 @@ require "test_helper"
 
 class GameTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
+  include GamePlayHelper
 
   setup do
     @anna = Profile.create!(name: "Anna")
@@ -46,6 +47,8 @@ class GameTest < ActiveSupport::TestCase
 
     assert @game.reload.finished?
     assert_not_nil @game.winner
+    assert_not_nil @game.started_at
+    assert_nil @game.abandoned_at, "won on points"
     assert_equal 1, @anna.reload.games_played
     assert_equal 1, @ben.reload.games_played
     assert_equal 1, @anna.games_won + @ben.games_won
@@ -213,6 +216,7 @@ class GameTest < ActiveSupport::TestCase
     @game.leave!(@game.seat_for(@anna))
 
     assert @game.reload.finished?
+    assert_equal @game.finished_at, @game.abandoned_at
     assert_equal 1, @anna.reload.games_played
     assert_equal 0, bot.profile.reload.games_played
   end
@@ -232,15 +236,5 @@ class GameTest < ActiveSupport::TestCase
   private
     def finish_round
       @game.play { |engine| engine.timeout! until engine.pending["type"] == "next_round" }
-    end
-
-    def play_out(engine)
-      until engine.over?
-        case engine.pending["type"]
-        when "turn" then engine.player(engine.pending["player"])["cards"].empty? ? engine.hit(engine.pending["player"]) : engine.stay(engine.pending["player"])
-        when "target" then engine.choose(engine.pending["player"], engine.pending["eligible"].first)
-        when "next_round" then engine.start_round
-        end
-      end
     end
 end

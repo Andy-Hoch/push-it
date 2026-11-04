@@ -1,0 +1,6 @@
+<%# locals: (label:, value:, note: nil) -%>
+<div class="seat items-center justify-center text-center">
+  <dt class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= label %></dt>
+  <dd class="font-display text-4xl text-gold"><%= value %></dd>
+  <% if note %><dd class="truncate text-sm text-cream/70"><%= note %></dd><% end %>
+</div>

@@ -1,0 +1,15 @@
+<%# locals: (title:, rows:) -%>
+<%# rows: [ [ label, count ], ... ] %>
+<div>
+  <h3 class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= title %></h3>
+  <% max = [ rows.map(&:last).max.to_i, 1 ].max %>
+  <ul class="mt-3 space-y-2">
+    <% rows.each do |label, count| %>
+      <li class="grid grid-cols-[5.5rem_1fr_2.5rem] items-center gap-3 text-sm">
+        <span class="truncate font-extrabold"><%= label %></span>
+        <span class="progress"><span style="width: <%= (100.0 * count / max).round %>%"></span></span>
+        <span class="text-right font-display text-lg tabular-nums"><%= number_with_delimiter(count) %></span>
+      </li>
+    <% end %>
+  </ul>
+</div>

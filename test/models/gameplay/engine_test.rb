@@ -270,6 +270,7 @@ class Gameplay::EngineTest < ActiveSupport::TestCase
     engine.stay(ANNA)
 
     assert engine.over?
+    assert_not engine.abandoned?
     assert_equal BEN, engine.winner["id"]
   end
 
@@ -308,7 +309,16 @@ class Gameplay::EngineTest < ActiveSupport::TestCase
     engine.start_round if engine.phase == "round_over"
 
     assert engine.over?
+    assert engine.abandoned?
     assert_equal ANNA, engine.winner["id"]
+  end
+
+  test "abandoning ends the game for the leader and says so" do
+    engine = engine_with(%w[ n5 n6 n7 ])
+    engine.abandon
+
+    assert engine.over?
+    assert engine.abandoned?
   end
 
   test "the next round starts only once everyone still at the table is ready" do

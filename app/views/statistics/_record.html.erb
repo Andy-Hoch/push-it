@@ -1,0 +1,3 @@
+<%# locals: (label:, record:) -%>
+<%= render "tile", label: label, value: record ? number_with_delimiter(record.points) : t("statistics.show.none"),
+      note: (record && "#{record.name}#{" · #{t("games.lobby.bot_levels.#{record.bot_level}")}" if record.bot?}") %>
