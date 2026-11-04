@@ -15,6 +15,13 @@ class Game < ApplicationRecord
 
   enum :status, %w[ lobby playing finished ].index_by(&:itself), default: :lobby
 
+  ORPHANED_AFTER = 24.hours
+
+  scope :started, -> { where(status: %w[ playing finished ]) }
+  scope :completed, -> { finished.where(abandoned_at: nil) }
+  scope :abandoned, -> { finished.where.not(abandoned_at: nil) }
+  scope :orphaned, -> { playing.where(updated_at: ...ORPHANED_AFTER.ago) }
+
   broadcasts_refreshes
   after_commit :signal_apps, on: %i[ update destroy ]
 

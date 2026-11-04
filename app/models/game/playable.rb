@@ -19,6 +19,7 @@ module Game::Playable
       engine = Gameplay::Engine.new(Gameplay::Engine.setup(players: players, target: target_score))
       engine.start_round
       self.status = :playing
+      self.started_at = Time.current
       commit(engine)
     end
   end
@@ -156,6 +157,7 @@ module Game::Playable
     def finish(engine)
       self.status = :finished
       self.finished_at = Time.current
+      self.abandoned_at = finished_at if engine.abandoned?
       self.winner = seats.find { |seat| seat.id == engine.winner&.dig("id") }&.profile
 
       engine.players.each do |player|

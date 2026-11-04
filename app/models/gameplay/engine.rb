@@ -84,6 +84,11 @@ class Gameplay::Engine
     phase == "game_over"
   end
 
+  # Over because players left, not because somebody reached the target.
+  def abandoned?
+    state["ended"] == "abandoned"
+  end
+
   def numbers_of(player)
     player["cards"].filter_map { |entry| Gameplay::Card.new(entry["code"]).value unless entry["flag"] }
   end
@@ -100,7 +105,7 @@ class Gameplay::Engine
     raise Gameplay::IllegalMove, :round_in_progress unless phase.in?(%w[ ready round_over ])
 
     contenders = players.reject { |player| player["left"] }
-    return finish_game(contenders.max_by { |player| player["total"] } || players.max_by { |player| player["total"] }) if contenders.size < 2
+    return finish_game(contenders.max_by { |player| player["total"] } || players.max_by { |player| player["total"] }, reason: "abandoned") if contenders.size < 2
 
     collect_table
     state["round"] += 1
@@ -170,7 +175,7 @@ class Gameplay::Engine
 
   # Ends the game on the spot, e.g. when only computer players are left at the table.
   def abandon
-    finish_game(players.max_by { |player| player["total"] }) unless over?
+    finish_game(players.max_by { |player| player["total"] }, reason: "abandoned") unless over?
   end
 
   def leave(id)
@@ -424,8 +429,10 @@ class Gameplay::Engine
       end
     end
 
-    def finish_game(winner)
+    # The reason is "target" when a player won on points, "abandoned" when the table emptied.
+    def finish_game(winner, reason: "target")
       state["phase"] = "game_over"
+      state["ended"] = reason
       state["pending"] = nil
       state["winner"] = winner&.dig("id")
       write_log :won, player: winner["name"], points: winner["total"] if winner

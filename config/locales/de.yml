@@ -287,3 +287,75 @@ de:
     errors:
       unauthorized: Unbekanntes oder fehlendes Gast-Token.
       not_found: Nicht gefunden.
+
+  statistics:
+    show:
+      title: Statistik
+      subtitle: So wird Push your Luck gespielt.
+      updated: "Stand: %{time} · wird alle paar Minuten aktualisiert"
+      person: Mensch
+      people: Menschen
+      bot: Computer
+      machine: Maschine
+      none: –
+      games:
+        title: Spiele
+        started: Gestartet
+        completed: Regulär beendet
+        abandoned: Abgebrochen
+        orphaned: Verwaist
+        running: Laufen gerade
+        lobbies: Offene Lobbys
+        hint: "Abgebrochen: Das Spiel endete, weil Spieler gegangen sind. Verwaist: Läuft noch, aber seit über 24 Stunden ist nichts passiert."
+      players:
+        title: Spieler
+        seats: Plätze in Spielen
+        people: Verschiedene Menschen
+        guests: davon Gäste
+        accounts: davon mit Account
+        average: Ø Spieler pro Spiel
+        table_sizes: Tischgrößen
+        table_size:
+          one: "%{count} Spieler"
+          other: "%{count} Spieler"
+      bots:
+        title: Computer-Spieler
+        created: erzeugt
+        seated: "%{count} in gestarteten Spielen"
+      win_rates:
+        title: Siegquote
+        hint: Nur regulär beendete Spiele. Bei Abbrüchen gewinnt einfach, wer gerade vorne lag.
+        games:
+          one: "%{wins} von %{count} Spiel"
+          other: "%{wins} von %{count} Spielen"
+        of_wins: "%{share} % der Siege"
+        by_level: Nach Stärke der Maschine
+      records:
+        title: Rekorde
+        best_round: Beste Runde
+        best_round_by_person: Beste Runde · Mensch
+        best_round_by_bot: Beste Runde · Computer
+        best_total: Höchste Endpunktzahl
+      gameplay:
+        title: Spielverlauf
+        rounds: Ø Runden pro Spiel
+        zero_rate: Nullrunden
+        zero_hint: Rundenwert 0 – meist ein Bust
+        jackpots: Jackpots gesamt
+        minutes: Ø Spieldauer
+        minutes_value: "%{count} min"
+      settings:
+        title: Einstellungen
+        target_scores: Zielpunktzahl
+        turn_timers: Zug-Timer
+        untimed: ohne
+        seconds: "%{count} s"
+        rematch_rate: Rematch-Quote
+      leaderboard:
+        title: Bestenliste
+        most_wins: Meiste Siege
+        best_rounds: Beste Runden
+        wins:
+          one: "1 Sieg · %{rate} %"
+          other: "%{count} Siege · %{rate} %"
+        empty: Noch keine beendeten Spiele.
