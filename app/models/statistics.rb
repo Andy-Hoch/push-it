@@ -2,10 +2,10 @@
 # seats and the engine state of each game, never from the counters on profiles: those
 # can be restored from a browser's localStorage and are not kept for bots.
 #
-# Kinds of player are nil (a person) or a bot level.
+# Kinds of player are nil (a person), a bot level, or :machine for all bots together.
 class Statistics
   KINDS = [ nil, *Gameplay::Bot::LEVELS ].freeze
-  LEADERBOARD_SIZE = 10
+  LEADERBOARD_SIZE = 3
 
   BEST = "json_extract(player.value, '$.best')".freeze
   DURATION = "(julianday(games.finished_at) - julianday(COALESCE(games.started_at, games.created_at))) * 86400".freeze
@@ -17,6 +17,7 @@ class Statistics
   end
 
   WinRate = Data.define(:kind, :games, :wins, :share) do
+    def machine? = kind.present?
     def rate = games.zero? ? 0 : (100.0 * wins / games).round
   end
 
@@ -72,16 +73,27 @@ class Statistics
   # -- Who wins ------------------------------------------------------------------
 
   # Only games won on points: an abandoned game is "won" by whoever happened to lead.
+  # Games count once per seat, so a table of two people and a bot gives people two.
   def win_rates
     @win_rates ||= begin
       games = completed_seats.group("profiles.bot_level").count
       wins = Game.completed.joins(:winner).group("profiles.bot_level").count
-      total = wins.values.sum
 
-      KINDS.map do |kind|
-        WinRate.new(kind: kind, games: games[kind].to_i, wins: wins[kind].to_i, share: total.zero? ? 0 : (100.0 * wins[kind].to_i / total).round)
-      end
+      KINDS.map { |kind| win_rate(kind, games[kind].to_i, wins[kind].to_i) }
     end
+  end
+
+  # [ people, all bots together ]
+  def people_vs_machines
+    @people_vs_machines ||= begin
+      people, *bots = win_rates
+      [ people, win_rate(:machine, bots.sum(&:games), bots.sum(&:wins)) ]
+    end
+  end
+
+  # One per bot level.
+  def bot_win_rates
+    win_rates.drop(1)
   end
 
   # -- Records -------------------------------------------------------------------
@@ -157,6 +169,11 @@ class Statistics
   end
 
   private
+    def win_rate(kind, games, wins)
+      total = (@completed_wins ||= Game.completed.where.not(winner_id: nil).count)
+      WinRate.new(kind: kind, games: games, wins: wins, share: total.zero? ? 0 : (100.0 * wins / total).round)
+    end
+
     def started_seats
       Seat.joins(:game, :profile).merge(Game.started)
     end

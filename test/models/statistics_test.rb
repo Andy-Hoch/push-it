@@ -52,6 +52,17 @@ class StatisticsTest < ActiveSupport::TestCase
     assert_equal 0, rates["easy"].wins, "the abandoned game does not count"
   end
 
+  test "people against machines adds up all bot levels" do
+    people, machines = @statistics.people_vs_machines
+
+    assert_not people.machine?
+    assert machines.machine?
+    assert_equal [ 1, 1 ], [ people.games, machines.games ]
+    assert_equal 1, people.wins + machines.wins
+    assert_equal 100, people.share + machines.share
+    assert_equal Gameplay::Bot::LEVELS, @statistics.bot_win_rates.map(&:kind)
+  end
+
   test "records come from the games, never from the counters on profiles" do
     Profile.restore(token: "spoofed", snapshot: { "name" => "Cheater", "stats" => { "games_won" => 999, "best_round" => 999 } })
     best = @completed.engine.players.max_by { |player| player["best"] }

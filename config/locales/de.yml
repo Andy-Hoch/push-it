@@ -296,6 +296,7 @@ de:
       person: Mensch
       people: Menschen
       bot: Computer
+      machine: Maschine
       none: –
       games:
         title: Spiele
@@ -327,7 +328,8 @@ de:
         games:
           one: "%{wins} von %{count} Spiel"
           other: "%{wins} von %{count} Spielen"
-        share: "%{share} % aller Siege"
+        of_wins: "%{share} % der Siege"
+        by_level: Nach Stärke der Maschine
       records:
         title: Rekorde
         best_round: Beste Runde

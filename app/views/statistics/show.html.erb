@@ -40,23 +40,50 @@
       </dl>
     </section>
 
-    <section class="panel space-y-4">
+    <section class="panel space-y-5">
       <h2 class="text-2xl"><%= t(".win_rates.title") %></h2>
-      <ul class="space-y-3">
-        <% stats.win_rates.each do |rate| %>
-          <li class="grid grid-cols-[5.5rem_1fr_3.5rem] items-center gap-3">
-            <span class="truncate font-extrabold"><%= kind_name.(rate.kind) %></span>
-            <span class="min-w-0">
-              <span class="progress block"><span style="width: <%= rate.rate %>%"></span></span>
-              <span class="mt-1 block text-xs text-cream/60">
-                <%= t(".win_rates.games", wins: number_with_delimiter(rate.wins), count: rate.games) %> ·
-                <%= t(".win_rates.share", share: rate.share) %>
-              </span>
-            </span>
-            <span class="text-right font-display text-2xl text-gold tabular-nums"><%= rate.rate %>&nbsp;%</span>
-          </li>
+
+      <% people, machines = stats.people_vs_machines %>
+      <dl class="grid grid-cols-2 gap-3">
+        <% [ people, machines ].each do |rate| %>
+          <div class="seat items-center text-center <%= "!bg-ice/10" if rate.machine? %>">
+            <dt class="font-extrabold">
+              <% if rate.machine? %><span class="me-1" aria-hidden="true">🤖</span><% end %>
+              <%= rate.machine? ? t(".machine") : t(".person") %>
+            </dt>
+            <dd class="font-display text-5xl <%= rate.machine? ? "text-ice" : "text-gold" %> tabular-nums"><%= rate.rate %>&nbsp;%</dd>
+            <dd class="text-xs text-cream/60"><%= t(".win_rates.games", wins: number_with_delimiter(rate.wins), count: rate.games) %></dd>
+          </div>
         <% end %>
-      </ul>
+      </dl>
+
+      <div>
+        <div class="flex h-3 overflow-hidden rounded-full bg-black/35">
+          <span class="bg-gold" style="width: <%= people.share %>%"></span>
+          <span class="bg-ice" style="width: <%= machines.share %>%"></span>
+        </div>
+        <div class="mt-1 flex justify-between text-xs text-cream/70">
+          <span><%= t(".person") %> · <%= t(".win_rates.of_wins", share: people.share) %></span>
+          <span><%= t(".win_rates.of_wins", share: machines.share) %> · <span class="me-1" aria-hidden="true">🤖</span> <%= t(".machine") %></span>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= t(".win_rates.by_level") %></h3>
+        <ul class="mt-2 space-y-1.5 text-sm">
+          <% stats.bot_win_rates.each do |rate| %>
+            <li class="grid grid-cols-[6rem_1fr_2.5rem] items-center gap-3">
+              <span class="truncate font-extrabold"><span class="me-1" aria-hidden="true">🤖</span> <%= kind_name.(rate.kind) %></span>
+              <span class="min-w-0">
+                <span class="progress block !h-1.5"><span style="width: <%= rate.rate %>%"></span></span>
+                <span class="mt-0.5 block text-xs text-cream/50"><%= t(".win_rates.games", wins: number_with_delimiter(rate.wins), count: rate.games) %></span>
+              </span>
+              <span class="text-right font-display tabular-nums"><%= rate.rate %>&nbsp;%</span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+
       <p class="text-sm text-cream/60"><%= t(".win_rates.hint") %></p>
     </section>
 
