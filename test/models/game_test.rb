@@ -54,15 +54,93 @@ class GameTest < ActiveSupport::TestCase
     assert_equal 1, @anna.games_won + @ben.games_won
   end
 
-  test "a rematch seats everyone at a fresh table once" do
+  test "a rematch seats only those who ask for it, at a lobby the old host runs" do
     @game.join!(@ben)
     @game.start!(by: @anna)
     @game.play { |engine| play_out(engine) }
 
     rematch = @game.rematch!(by: @ben)
     assert rematch.lobby?
-    assert_equal [ @anna, @ben ].sort_by(&:id), rematch.profiles.sort_by(&:id)
+    assert rematch.host?(@anna)
+    assert_equal [ @ben ], rematch.profiles
+    assert_equal [ @anna ], rematch.rematch_pending.map(&:profile)
+
     assert_equal rematch, @game.reload.rematch!(by: @anna)
+    assert_equal [ @anna, @ben ].sort_by(&:id), rematch.reload.profiles.sort_by(&:id)
+    assert_empty rematch.rematch_pending
+    assert_equal rematch, @game.reload.rematch!(by: @ben), "asking twice keeps the seat"
+  end
+
+  test "a rematch starts with whoever came and welcomes new players" do
+    carla = Profile.create!(name: "Carla")
+    @game.join!(@ben)
+    @game.join!(carla)
+    @game.start!(by: @anna)
+    @game.play { |engine| play_out(engine) }
+
+    rematch = @game.rematch!(by: @anna)
+    @game.reload.rematch!(by: @ben)
+    dora = Profile.create!(name: "Dora")
+    rematch.reload.join!(dora)
+    assert_equal [ carla ], rematch.reload.rematch_pending.map(&:profile)
+
+    rematch.start!(by: @anna)
+    assert rematch.playing?
+    assert_equal [ @anna, @ben, dora ].map(&:name).sort, rematch.engine.players.pluck("name").sort
+    assert_raises(Gameplay::IllegalMove) { @game.reload.rematch!(by: carla) }
+  end
+
+  test "turning a rematch down or being struck off empties the waiting list" do
+    carla = Profile.create!(name: "Carla")
+    @game.join!(@ben)
+    @game.join!(carla)
+    @game.start!(by: @anna)
+    @game.play { |engine| play_out(engine) }
+
+    rematch = @game.rematch!(by: @anna)
+    @game.reload.decline_rematch!(by: @ben)
+    assert_equal [ carla ], rematch.reload.rematch_pending.map(&:profile)
+
+    assert_raises(Gameplay::IllegalMove) { rematch.strike_invitation!(@game.seat_for(carla).id, by: @ben) }
+    rematch.strike_invitation!(@game.seat_for(carla).id, by: @anna)
+    assert_empty rematch.reload.rematch_pending
+
+    @game.reload.rematch!(by: @ben)
+    assert_includes rematch.reload.profiles, @ben, "changing your mind still works"
+  end
+
+  test "a host who turns the rematch down hands the lobby over" do
+    @game.join!(@ben)
+    @game.start!(by: @anna)
+    @game.play { |engine| play_out(engine) }
+
+    rematch = @game.rematch!(by: @ben)
+    assert rematch.host?(@anna)
+
+    @game.reload.decline_rematch!(by: @anna)
+    assert rematch.reload.host?(@ben)
+  end
+
+  test "a host who declined early does not run the rematch" do
+    @game.join!(@ben)
+    @game.start!(by: @anna)
+    @game.play { |engine| play_out(engine) }
+
+    @game.decline_rematch!(by: @anna)
+    assert @game.reload.rematch!(by: @ben).host?(@ben)
+  end
+
+  test "the host keeps a rematch lobby while still invited" do
+    carla = Profile.create!(name: "Carla")
+    @game.join!(@ben)
+    @game.join!(carla)
+    @game.start!(by: @anna)
+    @game.play { |engine| play_out(engine) }
+
+    rematch = @game.rematch!(by: @ben)
+    @game.reload.rematch!(by: carla)
+    rematch.reload.leave!(rematch.seat_for(carla))
+    assert rematch.reload.host?(@anna)
   end
 
   test "only the host changes the settings, and only in the lobby" do

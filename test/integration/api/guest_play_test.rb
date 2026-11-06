@@ -117,8 +117,43 @@ class Api::GuestPlayTest < ActionDispatch::IntegrationTest
 
     post api_v1_game_rematch_path(game), headers: auth(@ben), as: :json
     assert_response :created
-    assert_equal game.reload.rematch_code, response.parsed_body["code"]
-    assert_equal %w[ Ben Anna ], response.parsed_body["seats"].pluck("name")
+    rematch = response.parsed_body
+    assert_equal game.reload.rematch_code, rematch["code"]
+    assert_equal %w[ Ben ], rematch["seats"].pluck("name")
+    assert_equal false, rematch["host"]
+    assert_equal [ [ game.seat_for(@anna).id, "Anna" ] ], rematch["rematch_pending"].map { |seat| seat.values_at("id", "name") }
+
+    get api_v1_game_path(game), headers: auth(@anna)
+    assert_equal [ rematch["code"], false ], response.parsed_body.values_at("rematch_code", "rematch_joined")
+
+    post api_v1_game_rematch_path(game), headers: auth(@anna), as: :json
+    assert_equal %w[ Ben Anna ], response.parsed_body["seats"].pluck("name"), "the old seating order, shifted by one"
+    assert response.parsed_body["host"]
+    assert_empty response.parsed_body["rematch_pending"]
+  end
+
+  test "turning a rematch down and striking someone off its waiting list" do
+    carla = Profile.create!(name: "Carla")
+    game = Game.open_for!(@anna).tap do |table|
+      table.join!(@ben)
+      table.join!(carla)
+      table.start!(by: @anna)
+    end
+    game.play { |engine| engine.timeout! until engine.over? }
+
+    post api_v1_game_rematch_path(game), headers: auth(@anna), as: :json
+    code = response.parsed_body["code"]
+    assert_equal %w[ Ben Carla ], response.parsed_body["rematch_pending"].pluck("name")
+
+    delete api_v1_game_rematch_path(game), headers: auth(@ben), as: :json
+    assert_response :no_content
+
+    delete api_v1_game_invitation_path(code, game.seat_for(carla)), headers: auth(carla), as: :json
+    assert_equal "not_host", response.parsed_body["error"]
+
+    delete api_v1_game_invitation_path(code, game.seat_for(carla)), headers: auth(@anna), as: :json
+    assert_response :success
+    assert_empty response.parsed_body["rematch_pending"]
   end
 
   test "leaving and removing seats" do

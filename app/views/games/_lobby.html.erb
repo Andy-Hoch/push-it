@@ -40,6 +40,24 @@
       <% end %>
     </ul>
 
+    <% if (pending = game.rematch_pending).any? %>
+      <div class="space-y-2">
+        <p class="label !text-cream/60"><%= t(".pending") %></p>
+        <ul class="flex flex-wrap gap-2">
+          <% pending.each do |invited| %>
+            <li class="chip flex items-center gap-1" id="<%= dom_id invited, :invitation %>">
+              <span><%= invited.name %></span>
+              <% if game.host?(current_profile) && seat %>
+                <%= button_to "✕", game_invitation_path(game, invited), method: :delete, class: "btn-ghost !px-1 !py-0",
+                      aria: { label: t(".strike", name: invited.name) } %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+        <p class="text-sm text-cream/70"><%= t(".pending_hint") %></p>
+      </div>
+    <% end %>
+
     <% if seat.nil? %>
       <%= form_with url: game_seat_path(game), class: "paper flex flex-col gap-3 sm:flex-row sm:items-end" do |form| %>
         <div class="flex-1">

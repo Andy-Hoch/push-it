@@ -22,7 +22,8 @@ Rails.application.routes.draw do
       resource :hit, only: :create
       resource :stay, only: :create
       resource :choice, only: :create
-      resource :rematch, only: :create
+      resource :rematch, only: %i[ create destroy ]
+      resources :invitations, only: :destroy
     end
   end
 
@@ -40,7 +41,8 @@ Rails.application.routes.draw do
           resource :hit, only: :create
           resource :stay, only: :create
           resource :choice, only: :create
-          resource :rematch, only: :create
+          resource :rematch, only: %i[ create destroy ]
+      resources :invitations, only: :destroy
         end
       end
     end

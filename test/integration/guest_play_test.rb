@@ -189,6 +189,20 @@ class GuestPlayTest < ActionDispatch::IntegrationTest
     get game_path(game)
     assert_select ".overlay h2", I18n.t("games.game_over.winner", player: "Anna")
     assert_select "button", I18n.t("games.game_over.rematch")
+
+    post game_rematch_path(game)
+    rematch = Game.find_by(code: game.reload.rematch_code)
+    assert_redirected_to game_path(rematch)
+    follow_redirect!
+    assert_select "#invitation_seat_#{game.seats.find { |seat| seat.name == "Ben" }.id}", text: /Ben/
+    assert_select "p", I18n.t("games.lobby.pending")
+
+    get game_path(game)
+    assert_select "a", I18n.t("games.game_over.to_rematch")
+    assert_select "p", I18n.t("games.game_over.joined", players: "Anna")
+
+    delete game_rematch_path(game)
+    assert_redirected_to root_path
   end
 
   private
