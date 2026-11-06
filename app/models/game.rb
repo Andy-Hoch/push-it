@@ -12,6 +12,7 @@ class Game < ApplicationRecord
   belongs_to :winner, class_name: "Profile", optional: true
   has_many :seats, -> { order(:position) }, dependent: :destroy, inverse_of: :game
   has_many :profiles, through: :seats
+  has_one :previous_game, class_name: "Game", foreign_key: :rematch_code, primary_key: :code, inverse_of: false
 
   enum :status, %w[ lobby playing finished ].index_by(&:itself), default: :lobby
 

@@ -1,4 +1,12 @@
-json.(@game, :code, :status, :turn_seq, :turn_seconds, :target_score, :rematch_code)
+json.(@game, :code, :status, :turn_seq, :turn_seconds, :target_score)
+rematch = @game.rematch_game
+json.rematch_code rematch&.code
+json.rematch_joined rematch&.seat_for(current_profile).present?
+json.rematch_pending @game.rematch_pending do |seat|
+  json.id seat.id
+  json.name seat.name
+  json.host seat.profile_id == @game.host_id
+end
 json.server_time Time.current.iso8601(3)
 json.options do
   json.turn_seconds Game::TURN_SECONDS

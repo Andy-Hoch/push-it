@@ -34,6 +34,7 @@ de:
       round_not_over: Gerade gibt es keine Wertung – die Runde läuft schon weiter.
       left: Du hast den Tisch schon verlassen.
       invalid_bot_level: Diese Schwierigkeitsstufe gibt es nicht.
+      rematch_started: Die Revanche läuft schon ohne dich.
 
   log:
     round_started: "Runde %{round} – %{dealer} teilt aus."
@@ -256,6 +257,9 @@ de:
       need_players: Warte auf mindestens einen weiteren Spieler.
       waiting_for_host: "Warte, bis %{host} das Spiel startet … (%{timer} pro Zug, Ziel: %{target} Punkte)"
       leave: Tisch verlassen
+      pending: Noch nicht dabei
+      pending_hint: Das Spiel kann trotzdem jederzeit starten.
+      strike: "%{name} von der Warteliste nehmen"
     table:
       round: "Runde %{round}"
       target: "Ziel: %{target}"
@@ -281,6 +285,7 @@ de:
       points: "%{points} Punkte nach %{rounds} Runden"
       rematch: Revanche!
       to_rematch: Zur Revanche
+      joined: "Bei der Revanche dabei: %{players}"
       home: Zur Startseite
 
   api:

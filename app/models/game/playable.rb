@@ -75,20 +75,57 @@ module Game::Playable
     Time.zone.parse(engine.pending["summary_at"]) if engine.pending&.dig("summary_at")
   end
 
+  # Everyone at the finished table decides for themselves: the first "rematch" opens a
+  # fresh lobby (same host, same settings, fresh bots), every later one takes a seat there.
   def rematch!(by:)
     with_lock do
       raise Gameplay::IllegalMove, :game_not_finished unless finished?
 
-      Game.find_by(code: rematch_code) || Game.transaction do
-        Game.create!(host: by, turn_seconds: turn_seconds, target_score: target_score).tap do |game|
-          present_seats.rotate(1).each_with_index { |seat, index| game.seats.create!(profile: seat.profile.rematch_profile, position: index) }
-          update!(rematch_code: game.code)
-        end
+      seat = seat_for(by)
+      raise Gameplay::IllegalMove, :not_seated if seat.nil? || seat.bot? || seat.left?
+
+      game = rematch_game || open_rematch(by)
+      unless game.seat_for(by)
+        raise Gameplay::IllegalMove, :rematch_started unless game.lobby?
+
+        game.join!(by, position: rematch_position(by))
       end
+      seat.update!(rematch_declined_at: nil)
+      touch
+      game
     end
   end
 
+  # Going home from the final banner turns the rematch down.
+  def decline_rematch!(by:)
+    with_lock do
+      seat = seat_for(by)
+      next unless finished? && seat && !seat.bot?
+
+      seat.update!(rematch_declined_at: Time.current)
+      rematch_game&.pass_on_host(from: by)
+    end
+  end
+
+  def rematch_game
+    Game.find_by(code: rematch_code) if rematch_code
+  end
+
   private
+    def open_rematch(by)
+      next_host = present_seats.any? { |seat| seat.profile_id == host_id && !seat.rematch_declined_at } ? host : by
+
+      Game.create!(host: next_host, turn_seconds: turn_seconds, target_score: target_score).tap do |game|
+        present_seats.select(&:bot?).each { |seat| game.seats.create!(profile: seat.profile.rematch_profile, position: rematch_position(seat.profile)) }
+        update!(rematch_code: game.code)
+      end
+    end
+
+    # The rematch keeps the old seating order, shifted by one so someone else starts.
+    def rematch_position(profile)
+      present_seats.rotate(1).index { |seat| seat.profile_id == profile.id }
+    end
+
     def play_locked
       raise Gameplay::IllegalMove, :game_not_running unless playing?
 

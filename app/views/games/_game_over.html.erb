@@ -23,13 +23,23 @@
       <% end %>
     </ol>
 
+    <% rematch = table.game.rematch_game %>
+    <% playing_on = table.seat && !table.seat.left? %>
+    <% if rematch && (joined = rematch.seats.reject(&:bot?).map(&:name)).any? %>
+      <p class="mt-6 text-sm text-ink/70"><%= t(".joined", players: joined.to_sentence) %></p>
+    <% end %>
+
     <div class="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-      <% if table.game.rematch_code %>
-        <%= link_to t(".to_rematch"), game_path(table.game.rematch_code), class: "btn btn-gold" %>
-      <% elsif table.seat %>
+      <% if rematch&.seat_for(table.seat&.profile) || (rematch&.lobby? && !playing_on) %>
+        <%= link_to t(".to_rematch"), game_path(rematch), class: "btn btn-gold" %>
+      <% elsif playing_on && (rematch.nil? || rematch.lobby?) %>
         <%= button_to t(".rematch"), game_rematch_path(table.game), class: "btn btn-gold w-full" %>
       <% end %>
-      <%= link_to t(".home"), root_path, class: "btn btn-cream" %>
+      <% if playing_on %>
+        <%= button_to t(".home"), game_rematch_path(table.game), method: :delete, class: "btn btn-cream w-full" %>
+      <% else %>
+        <%= link_to t(".home"), root_path, class: "btn btn-cream" %>
+      <% end %>
     </div>
   </div>
 </div>
