@@ -54,6 +54,13 @@ class Api::GuestPlayTest < ActionDispatch::IntegrationTest
     assert me["cards"].all? { |card| card.key?("kind") && card.key?("uid") }
   end
 
+  test "a quick start answers with a running table against two easy computer players" do
+    post api_v1_quick_start_path, headers: auth(@anna), as: :json
+    assert_response :created
+    assert_equal "playing", response.parsed_body["status"]
+    assert_equal [ false, true, true ], response.parsed_body.dig("table", "players").pluck("bot")
+  end
+
   test "the host seats a computer player" do
     post api_v1_games_path, headers: auth(@anna), as: :json
     code = response.parsed_body["code"]

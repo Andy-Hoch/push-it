@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   resource :profile, only: %i[ show update destroy ]
   resource :profile_restoration, only: :create
   resource :join, only: :create
+  resource :quick_start, only: :create
 
   # Public but deliberately linked from nowhere.
   resource :statistics, only: :show, path: "statistik"
@@ -31,6 +32,7 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resource :profile, only: %i[ show create update destroy ]
+      resource :quick_start, only: :create
 
       resources :games, only: %i[ create show update ], param: :code do
         scope module: :games do

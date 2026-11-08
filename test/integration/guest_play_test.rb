@@ -1,6 +1,18 @@
 require "test_helper"
 
 class GuestPlayTest < ActionDispatch::IntegrationTest
+  test "a quick start goes straight to a running table against two computer players" do
+    post quick_start_path, params: { name: "Anna" }
+    game = Game.last
+    assert_redirected_to game_path(game)
+    assert game.playing?
+    assert_equal [ false, true, true ], game.seats.map(&:bot?)
+    assert_equal "Anna", game.host.name
+
+    follow_redirect!
+    assert_response :success
+  end
+
   test "a guest opens a table, a friend joins by code and they play" do
     post games_path, params: { name: "Anna" }
     game = Game.last

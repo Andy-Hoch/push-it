@@ -15,6 +15,15 @@ class GameTest < ActiveSupport::TestCase
     assert_equal @game, Game.find_by_code(" #{@game.code.downcase} ")
   end
 
+  test "a quick start skips the lobby and plays against two easy computer players" do
+    game = Game.quick_start!(@ben)
+
+    assert game.playing?
+    assert_equal @ben, game.host
+    assert_equal [ nil, "easy", "easy" ], game.seats.map(&:bot_level)
+    assert_equal game.seats.map(&:id), game.engine.state["players"].pluck("id")
+  end
+
   test "players join in the lobby, the host starts and the first turn is timed" do
     @game.join!(@ben)
 

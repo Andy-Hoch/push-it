@@ -7,6 +7,7 @@ class Game < ApplicationRecord
   CODE_LENGTH = 6
   TURN_SECONDS = [ 0, 20, 30, 45, 60, 90 ].freeze
   TARGET_SCORES = [ 100, 150, 200, 300 ].freeze
+  QUICK_START_BOTS = 2
 
   belongs_to :host, class_name: "Profile"
   belongs_to :winner, class_name: "Profile", optional: true
@@ -42,6 +43,16 @@ class Game < ApplicationRecord
   def self.open_for!(host)
     transaction do
       create!(host: host).tap { |game| game.seats.create!(profile: host, position: 0) }
+    end
+  end
+
+  # Skips the lobby: the host plays right away against two easy computer players.
+  def self.quick_start!(host)
+    transaction do
+      open_for!(host).tap do |game|
+        QUICK_START_BOTS.times { game.add_bot!(level: "easy", by: host) }
+        game.start!(by: host)
+      end
     end
   end
 
