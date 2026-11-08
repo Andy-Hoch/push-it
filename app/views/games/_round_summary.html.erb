@@ -1,6 +1,7 @@
 <% me = table.me %>
 <% best = table.players.filter_map { |player| player.dig("round_score", "total") }.max.to_i %>
-<div id="round-summary" class="overlay" data-controller="dismiss reveal" data-reveal-delay-value="<%= table.summary_delay_ms %>">
+<div id="round-summary" class="overlay" data-controller="dismiss reveal summary" data-reveal-delay-value="<%= table.summary_delay_ms %>"
+     data-action="reveal:shown->summary#play">
   <div class="paper w-full max-w-lg !p-4 sm:!p-6">
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
@@ -31,8 +32,11 @@
       <tbody class="divide-y divide-ink/10">
         <% table.standings.each_with_index do |player, index| %>
           <% score = player["round_score"] %>
-          <tr class="<%= "bg-gold/15" if table.me?(player) %>">
-            <td class="py-2 font-display text-lg text-ink/50"><%= index + 1 %></td>
+          <% before = player["total"] - (score && !score["busted"] ? score["total"].to_i : 0) %>
+          <tr class="<%= "bg-gold/15" if table.me?(player) %>" data-summary-target="row">
+            <td class="py-2 font-display text-lg <%= index.zero? ? "text-gold-dark" : "text-ink/50" %>">
+              <span class="inline-block" <%= "data-summary-target=leader" if index.zero? %>><%= index + 1 %></span>
+            </td>
             <td class="py-2">
               <div class="flex min-w-0 items-center gap-1.5">
                 <span class="truncate font-extrabold"><%= table.name_for(player) %></span>
@@ -52,8 +56,10 @@
               <% end %>
             </td>
             <td class="py-2 text-right">
-              <p class="font-display text-xl tabular-nums"><%= player["total"] %></p>
-              <div class="progress ml-auto !h-1 w-full !bg-ink/10"><span style="width: <%= table.progress(player) %>%"></span></div>
+              <p class="font-display text-xl tabular-nums" data-summary-target="total" data-from="<%= before %>" data-to="<%= player["total"] %>"><%= player["total"] %></p>
+              <div class="progress ml-auto !h-1 w-full !bg-ink/10">
+                <span class="origin-left" style="width: <%= table.progress(player) %>%" data-summary-target="bar" data-from="<%= before %>" data-to="<%= player["total"] %>"></span>
+              </div>
             </td>
           </tr>
         <% end %>
