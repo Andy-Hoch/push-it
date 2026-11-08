@@ -1,9 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
+import { EASE_OUT, reducedMotion } from "lib/motion"
 
 // Keeps an overlay out of sight for a moment, then fades it in. The round summary
 // uses it so everyone first sees the card that ended the round. Like the deal
 // controller it only uses the Web Animations API, so Turbo morphs (which sync
-// attributes) neither cut the pause short nor replay it.
+// attributes) neither cut the pause short nor replay it. Once visible it dispatches
+// reveal:shown, which the round summary uses to build itself up.
 const FADE = 250
 const HIDDEN = { opacity: 0, visibility: "hidden" }
 
@@ -22,12 +24,13 @@ export default class extends Controller {
   }
 
   show() {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    this.dispatch("shown")
+    if (reducedMotion()) return
 
-    this.element.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FADE, easing: "ease-out" })
+    this.element.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FADE, easing: EASE_OUT })
     this.element.firstElementChild?.animate([
       { transform: "translateY(24px) scale(0.97)" },
       { transform: "none" }
-    ], { duration: FADE + 200, easing: "cubic-bezier(0.2, 0.9, 0.3, 1.1)" })
+    ], { duration: FADE + 100, easing: EASE_OUT })
   }
 }
