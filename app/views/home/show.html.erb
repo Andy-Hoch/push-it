@@ -17,7 +17,13 @@
         <%= form.text_field :name, value: current_profile&.name, maxlength: 24, placeholder: t(".name_placeholder"), autocomplete: "nickname", class: "field" %>
       </div>
 
-      <%= form.button t(".new_game"), class: "btn btn-gold w-full text-xl", formnovalidate: true %>
+      <div class="space-y-2">
+        <div class="grid grid-cols-2 gap-3">
+          <%= form.button t(".new_game"), class: "btn btn-gold w-full text-xl", formnovalidate: true %>
+          <%= form.button t(".quick_start"), formaction: quick_start_path, class: "btn btn-ember w-full text-xl", formnovalidate: true %>
+        </div>
+        <p class="text-sm text-ink/60"><%= t(".quick_start_hint") %></p>
+      </div>
 
       <div class="flex items-center gap-3 text-sm font-extrabold tracking-wider text-ink/40 uppercase">
         <span class="h-px flex-1 bg-ink/15"></span><%= t(".or_join") %><span class="h-px flex-1 bg-ink/15"></span>
