@@ -12,15 +12,15 @@
 
 Die Regeln stecken in `app/models/gameplay/` als reines Ruby ohne Datenbank:
 
-- **Deck**: 94 Karten, nämlich 0 bis 12 (die Zahl n kommt n-mal vor, die 0 einmal), +2/+4/+6/+8/+10, ×2 und je drei Freeze, Dreierlei und Second Chance.
+- **Deck**: 94 Karten, nämlich 0 bis 12 (die Zahl n kommt n-mal vor, die 0 einmal), +2/+4/+6/+8/+10, ×2 und je drei Freeze, Dreierlei und Extra Leben.
 - **Spielablauf**: Hit oder Stay. Eine doppelte Zahl bedeutet Bust und 0 Punkte. 7 verschiedene Zahlen ergeben den Jackpot. Das beendet die Runde und gibt +15 Punkte.
 - **Wertung**: Zahlen addieren, mit ×2 verdoppeln, dann die Modifikatoren und den Jackpot-Bonus addieren.
 - **Freeze und Dreierlei** gehen auf einen beliebigen aktiven Spieler, auch auf einen selbst.
   - Aktionskarten, die während Dreierlei gezogen werden, wirken erst nach den drei Karten.
   - Busted das Ziel, verfallen sie.
-- **Second Chance**:
-  - Man darf nur eine besitzen. Eine zweite muss man weitergeben, sonst wird sie abgeworfen.
-  - Sie schützt automatisch vor einem Duplikat.
+- **Extra Leben**:
+  - Man darf nur eines besitzen. Ein zweites muss man weitergeben, sonst wird es abgeworfen.
+  - Es schützt automatisch vor einem Duplikat.
 - **Aktionskarten beim Austeilen** werden sofort aufgelöst.
 - **Letzter aktiver Spieler**: Er muss Aktionskarten auf sich selbst spielen.
 - **Ablagestapel**: Er wird erst gemischt, wenn der Stapel leer ist, nicht zwischen den Runden. Der Dealer rotiert.
