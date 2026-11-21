@@ -20,6 +20,16 @@ module GamesHelper
     end
   end
 
+  # Lets the moment controller play staying, busting, freezing and jackpots once.
+  def seat_moment_data(player)
+    tag.attributes(data: { controller: "moment", moment_status_value: player["status"], moment_jackpot_value: player["jackpot"].present? })
+  end
+
+  # A score that counts up when it rises (tally controller).
+  def tally_data(value, prefix: nil)
+    tag.attributes(data: { controller: "tally", tally_value_value: value, tally_prefix_value: prefix }.compact)
+  end
+
   def seat_classes(table, player)
     [ "seat", ("is-turn" if table.turn?(player)), ("is-target" if table.choosable?(player)), "is-#{player["status"]}" ]
   end

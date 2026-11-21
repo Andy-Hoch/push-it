@@ -1,5 +1,5 @@
 <% winner = table.winner %>
-<div class="overlay" data-controller="dismiss">
+<div class="overlay" data-controller="<%= class_names("dismiss", celebrate: winner) %>" data-celebrate-game-value="<%= table.game.code %>">
   <div class="paper w-full max-w-xl text-center">
     <div class="flex justify-end">
       <button type="button" class="btn-ghost !text-ink/60 hover:!bg-ink/5" data-action="dismiss#remove" aria-label="<%= t("games.round_summary.peek") %>">✕</button>

@@ -1,4 +1,4 @@
-<article id="seat-<%= player["id"] %>" class="<%= class_names(seat_classes(table, player)) %>">
+<article id="seat-<%= player["id"] %>" class="<%= class_names(seat_classes(table, player)) %>" <%= seat_moment_data(player) %>>
   <header class="flex items-center gap-2">
     <%= avatar_tag table.name_for(player) %>
     <div class="min-w-0 flex-1">
@@ -9,8 +9,8 @@
       <div class="flex items-center gap-1.5"><%= status_badge player %><% if player["left"] %><span class="badge badge-out"><%= t("games.status.left") %></span><% end %></div>
     </div>
     <div class="text-right leading-tight">
-      <p class="font-display text-2xl"><%= player["total"] %></p>
-      <p class="text-xs font-bold text-cream/70" data-deal-target="spoiler">+<%= table.score(player)["total"] %></p>
+      <p class="tally font-display text-2xl" <%= tally_data(player["total"]) %>><%= player["total"] %></p>
+      <p class="text-xs font-bold text-cream/70" data-deal-target="spoiler"><span class="tally" <%= tally_data(table.score(player)["total"], prefix: "+") %>>+<%= table.score(player)["total"] %></span></p>
     </div>
   </header>
 

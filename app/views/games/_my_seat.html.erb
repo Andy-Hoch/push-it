@@ -1,5 +1,5 @@
 <% score = table.score(player) %>
-<section id="seat-<%= player["id"] %>" class="<%= class_names(seat_classes(table, player), "!p-4 sm:!p-5") %>">
+<section id="seat-<%= player["id"] %>" class="<%= class_names(seat_classes(table, player), "!p-4 sm:!p-5") %>" <%= seat_moment_data(player) %>>
   <header class="flex flex-wrap items-center gap-3">
     <%= avatar_tag table.name_for(player), classes: "!size-11 !text-xl" %>
     <div class="min-w-0 flex-1">
@@ -13,11 +13,11 @@
     <div class="flex items-center gap-5 text-right leading-tight">
       <div>
         <p class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= t("games.this_round") %></p>
-        <p class="font-display text-3xl text-gold" data-deal-target="spoiler"><%= score["total"] %></p>
+        <p class="tally font-display text-3xl text-gold" data-deal-target="spoiler" <%= tally_data(score["total"]) %>><%= score["total"] %></p>
       </div>
       <div>
         <p class="text-xs font-extrabold tracking-wider text-cream/60 uppercase"><%= t("games.total") %></p>
-        <p class="font-display text-3xl"><%= player["total"] %></p>
+        <p class="tally font-display text-3xl" <%= tally_data(player["total"]) %>><%= player["total"] %></p>
       </div>
     </div>
   </header>

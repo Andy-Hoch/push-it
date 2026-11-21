@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { EASE_IN_OUT, EASE_OUT, flash } from "lib/motion"
 
 // Deals newly appearing cards one after another, like a dealer going around the table:
 // a card back flies from the deck to the card's place, then the card turns face up.
@@ -8,7 +9,6 @@ const STEP = 350
 const FLIGHT = 420
 const TURN = 260
 const MAX_TOTAL = 4000
-const GLOW = "inset 0 0 0 2px #f6b80a, 0 0 26px rgb(246 184 10 / 0.55)"
 const SHAKE = [
   { transform: "rotate(0)" },
   { transform: "rotate(-6deg) translateX(-4px)" },
@@ -67,6 +67,7 @@ export default class extends Controller {
     cards.forEach((card, index) => setTimeout(() => this.deal(card), start + index * step - now))
     this.nextSlot = start + cards.length * step
     this.dealingUntil = this.nextSlot - step + FLIGHT + TURN
+    this.element.dealingUntil = this.dealingUntil // read by lib/motion's afterDeal; a property, so morphs keep it
     this.controlsTargets.forEach((controls) => this.hold(controls, { inert: true }))
     this.spoilerTargets.forEach((spoiler) => this.hold(spoiler))
   }
@@ -90,7 +91,7 @@ export default class extends Controller {
     ghost.animate([
       { transform: "translate(0, 0) rotate(-10deg)" },
       { transform: `translate(${to.left - from.left}px, ${to.top - from.top}px) rotate(0) scale(${scale})` }
-    ], { duration: FLIGHT, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)" }).finished
+    ], { duration: FLIGHT, easing: EASE_IN_OUT }).finished
       .then(() => this.reveal(card))
       .finally(() => ghost.remove())
 
@@ -105,17 +106,17 @@ export default class extends Controller {
     const turn = card.animate([
       { transform: "perspective(600px) rotateY(90deg)", opacity: 0.7 },
       { transform: rest === "none" ? "none" : rest, opacity: 1 }
-    ], { duration: this.reducedMotion ? 150 : TURN, easing: "ease-out" })
+    ], { duration: this.reducedMotion ? 150 : TURN, easing: EASE_OUT })
 
     if (card.classList.contains("is-bust")) {
-      turn.finished.then(() => card.animate(SHAKE, { duration: 500, easing: "ease-in-out" })).catch(() => {})
+      turn.finished.then(() => card.animate(SHAKE, { duration: 500, easing: EASE_IN_OUT })).catch(() => {})
     }
   }
 
   highlight(seat) {
     if (!seat || this.reducedMotion) return
 
-    seat.animate([{ boxShadow: GLOW }, { boxShadow: getComputedStyle(seat).boxShadow }], { duration: FLIGHT + TURN + 300, easing: "ease-out" })
+    flash(seat, "glow", { peak: 1, duration: FLIGHT + TURN + 300 })
   }
 
   // Until the cards have landed nobody can hit or stay, and scores and the log
